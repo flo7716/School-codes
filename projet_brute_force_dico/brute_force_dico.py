@@ -6,8 +6,7 @@ Created on Fri May 12 13:58:34 2023
 """
 
 import zipfile,time
-import tkinter as tk
-from tkinter import ttk
+
 
 import itertools
 tc=time.time()
