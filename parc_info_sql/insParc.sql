@@ -18,15 +18,15 @@ INSERT INTO SALLE (nSalle, nomSalle, nbPoste, indIP) VALUES
 
 -- Insertion de données dans la table POSTE
 INSERT INTO POSTE (nPoste, nomPoste, indIP, ad, typePoste, nSalle) VALUES
-('p1', 'Poste 1', '130.120.80', '01', 'TM', 'S01'),
+('p1', 'Poste 1', '130.120.80', '01', 'TX', 'S01'),
 ('p2', 'Poste 2', '130.120.80', '02', 'UNIX', 'S01'),
-('p3', 'Poste 3', '130.120.80', '03', 'TM', 'S01'),
+('p3', 'Poste 3', '130.120.80', '03', 'TX', 'S01'),
 ('p4', 'Poste 4', '130.120.80', '04', 'PCWS', 'S02'),
 ('p5', 'Poste 5', '130.120.80', '05', 'PCWS', 'S02'),
 ('p6', 'Poste 6', '130.120.80', '06', 'UNIX', 'S03'),
-('p7', 'Poste 7', '130.120.80', '07', 'TM', 'S03'),
+('p7', 'Poste 7', '130.120.80', '07', 'TX', 'S03'),
 ('p8', 'Poste 8', '130.120.81', '01', 'UNIX', 'S11'),
-('p9', 'Poste 9', '130.120.81', '02', 'TM', 'S11'),
+('p9', 'Poste 9', '130.120.81', '02', 'TX', 'S11'),
 ('p10', 'Poste 10', '130.120.81', '03', 'UNIX', 'S12'),
 ('p11', 'Poste 11', '130.120.82', '01', 'PCNT', 'S21'),
 ('p12', 'Poste 12', '130.120.82', '02', 'PCWS', 'S21');
@@ -63,7 +63,7 @@ INSERT INTO INSTALLER (nPoste, nLog, numIns, dateIns, delai) VALUES
 
 -- Insertion de données dans la table TYPES
 INSERT INTO TYPES (typeLP, nomType) VALUES
-('TM', 'Terminal X-Window'),
+('TX', 'Terminal X-Window'),
 ('UNIX', 'Système Unix'),
 ('PCNT', 'PC Windows NT'),
 ('PCWS', 'PC Windows'),
