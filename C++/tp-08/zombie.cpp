@@ -2,6 +2,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 class Position{
     public:
@@ -79,11 +81,15 @@ class Player : public Character{
 
 };
 
-class Zombie : public Character{
-    public:
-        Zombie(Position position) : Character(position){}
+class Zombie : public Character {
+public:
+    // Ajouter un constructeur par défaut
+    Zombie() : Character(Position{0, 0}) {} // Vous pouvez initialiser la position du zombie à (0, 0) par défaut si nécessaire
 
+    // Garder le constructeur existant si nécessaire
+    Zombie(Position position) : Character(position) {}
 };
+
 
 
 class Exit : public GameObject{
@@ -156,6 +162,26 @@ Classe GameManager qui a un attribut mPlayer et mZombie initialisés dans le con
 */
 
 class GameManager{
+    private:
+    void placeZombieRandomly() {
+        // Initialiser le générateur de nombres aléatoires avec le temps actuel
+        srand(time(NULL));
+
+        do {
+            // Générer des coordonnées aléatoires pour le zombie
+            int randomX = rand() % mMap.tiles[0].size();
+            int randomY = rand() % mMap.tiles.size();
+
+            // Vérifier si le zombie respecte la règle
+            if (abs(randomX - mPlayer.mPosition.mX) >= 3 && abs(randomY - mPlayer.mPosition.mY) >= 3) {
+                // Si les coordonnées respectent la règle, placer le zombie à cet emplacement
+                mZombie.mPosition.mX = randomX;
+                mZombie.mPosition.mY = randomY;
+                break; // Sortir de la boucle do-while
+            }
+        } while (true);
+    }
+
     public:
         Player mPlayer;
         Zombie mZombie;
@@ -165,7 +191,9 @@ class GameManager{
     
 
     GameManager() 
-    : mPlayer(Position{0, 0}), mZombie(Position{5, 5}), mGameOver(false), mExit(Position{9, 4}) {}
+    : mPlayer(Position{0, 0}), mGameOver(false), mExit(Position{9, 4}) {
+        placeZombieRandomly();
+    }
 
     void player_turn() {
         string direction;
@@ -200,45 +228,51 @@ class GameManager{
         }
     }
 
+    
+
 
     void zombie_turn() {
-    int delta_x = 0;
-    int delta_y = 0;
+        // Calculer les déplacements du zombie en fonction de la position du joueur
+        int delta_x = 0;
+        int delta_y = 0;
 
-    // Calculer les déplacements du zombie en fonction de la position du joueur
-    if (mPlayer.mPosition.mX > mZombie.mPosition.mX) {
-        delta_x = 1;
-    } else if (mPlayer.mPosition.mX < mZombie.mPosition.mX) {
-        delta_x = -1;
-    }
+        if (mPlayer.mPosition.mX > mZombie.mPosition.mX) {
+            delta_x = 1;
+        } else if (mPlayer.mPosition.mX < mZombie.mPosition.mX) {
+            delta_x = -1;
+        }
 
-    if (mPlayer.mPosition.mY > mZombie.mPosition.mY) {
-        delta_y = 1;
-    } else if (mPlayer.mPosition.mY < mZombie.mPosition.mY) {
-        delta_y = -1;
-    }
+        if (mPlayer.mPosition.mY > mZombie.mPosition.mY) {
+            delta_y = 1;
+        } else if (mPlayer.mPosition.mY < mZombie.mPosition.mY) {
+            delta_y = -1;
+        }
 
-    // Calculer les nouvelles positions du zombie
-    int newX = mZombie.mPosition.mX + delta_x;
-    int newY = mZombie.mPosition.mY + delta_y;
+        // Calculer les nouvelles positions du zombie en maintenant une case de décalage avec le joueur
+        int newX = mPlayer.mPosition.mX - delta_x;
+        int newY = mPlayer.mPosition.mY - delta_y;
 
-    // Vérifier si la nouvelle position est à l'intérieur des limites de la carte
-    if (newX >= 0 && newX < mMap.tiles[0].size() && newY >= 0 && newY < mMap.tiles.size()) {
-        // La nouvelle position est valide, mettre à jour la position du zombie
-        mZombie.mPosition.mX = newX;
-        mZombie.mPosition.mY = newY;
+        // Vérifier si la nouvelle position est à l'intérieur des limites de la carte
+        if (newX >= 0 && newX < mMap.tiles[0].size() && newY >= 0 && newY < mMap.tiles.size()) {
+            // Mettre à jour la position du zombie
+            mZombie.mPosition.mX = newX;
+            mZombie.mPosition.mY = newY;
 
-        // Vérifier si le zombie attaque le joueur s'il est à la même position
-        if (mPlayer.mPosition.mX == newX+abs(1) && mPlayer.mPosition.mY == newY+abs(1)) {
-            mPlayer.mHealth--; // Réduire la santé du joueur
+            // Vérifier si le joueur est adjacent au zombie après le déplacement
+            if ((abs(mPlayer.mPosition.mX - mZombie.mPosition.mX) <= 1) || (abs(mPlayer.mPosition.mY - mZombie.mPosition.mY) <= 1)) {
+                // Si le joueur est adjacent au zombie, réduire les points de vie du joueur
+                mPlayer.mHealth--;
+            }
+        }
+
+        // Vérifier si le joueur est mort
+        if (mPlayer.mHealth <= 0) {
+            cout << "Game over" << endl;
+            system("pause");
+            mGameOver = true; // Définir le jeu comme terminé
         }
     }
-
-    // Vérifier si le joueur est mort
-    if (mPlayer.mHealth <= 0) {
-        mGameOver = true; // Définir le jeu comme terminé
-    }
-    }
+    
 
     void draw_title(){
         cout << "Zombie" << endl;
