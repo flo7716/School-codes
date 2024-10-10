@@ -8,9 +8,9 @@ servo.rotate_servo(94)
 
 def main(speed):
     gpg.set_speed(speed)
-    gpg.drive_cm(100)
+    gpg.forward(100)
     gpg.set_speed(300)
-    gpg.drive_cm(100)
+    gpg.forward(100)
 
 def obstacle_detection():
     if my_distance_sensor <= 200:
