@@ -15,9 +15,13 @@ def main(speed):
 def obstacle_detection():
     if my_distance_sensor <= 200:
         gpg.stop()
+        return True
 
 if __name__ == main:
-    SPEED = 150
-    main(speed=SPEED)
+    while obstacle_detection != True:
+        SPEED = 150
+        main(speed=SPEED)
+
+
 
 
