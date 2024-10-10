@@ -13,7 +13,8 @@ def main(speed):
     gpg.drive_cm(100)
 
 def obstacle_detection():
-
+    if my_distance_sensor <= 200:
+        gpg.stop()
 
 if __name__ == main:
     SPEED = 150
