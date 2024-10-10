@@ -9,8 +9,10 @@ gpg.close_right_eye()
 
 
 def main(speed):
-    gpg.set_speed(300)
+    gpg.set_speed(speed)
     gpg.drive_cm(100)
+    gpg.set_speed(300)
+    gpg.drive(100)
 
 
 
