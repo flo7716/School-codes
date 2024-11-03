@@ -1,0 +1,2 @@
+docker-compose run app python script.py
+docker-compose run -p 8888:8888 app jupyter notebook --ip=0.0.0.0 --no-browser --allow-root
