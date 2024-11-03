@@ -13,5 +13,5 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Installer les bibliothèques Python
-RUN pip install --no-cache-dir scikit-learn beautifulsoup4 nltk requests flask
+RUN pip install --no-cache-dir scikit-learn beautifulsoup4 nltk requests flask ipykernel seaborn matplotlib pandas statsmodels
 
