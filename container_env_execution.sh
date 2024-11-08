@@ -23,5 +23,5 @@ else
     # Cloner le dépôt git dans /Documents/School-codes
     cd Documents && mkdir School-codes
     cd School-codes
-    git clone $GIT_REPO
+    git clone $GITHUB_REPO
 fi
