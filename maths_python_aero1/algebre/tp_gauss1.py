@@ -54,6 +54,7 @@ debut=time.perf_counter()
 X=Gauss(A,B)
 err=np.linalg.norm(A@X-B)
 duree=time.perf_counter()-debut
+print(X)
 print(duree,err)
 
 
