@@ -1,0 +1,3 @@
+CONTAINER_NAME="contenv"
+IMAGE_NAME="my-python-app"
+GITHUB_REPO="https://github.com/flo7716/School-codes"
