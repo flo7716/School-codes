@@ -21,4 +21,3 @@ Her eighth husband, Rashid Rajput, was deported in 2006 to his native Pakistan a
 If convicted, Barrientos faces up to four years in prison.  Her next court appearance is scheduled for May 18.
 """
 print(summarizer(ARTICLE, max_length=130, min_length=30, do_sample=False))
->>> [{'summary_text': 'Liana Barrientos, 39, is charged with two counts of "offering a false instrument for filing in the first degree" In total, she has been married 10 times, with nine of her marriages occurring between 1999 and 2002. She is believed to still be married to four men.'}]
