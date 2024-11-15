@@ -21,4 +21,4 @@ Investigation Division. Seven of the men are from so-called "red-flagged" countr
 Her eighth husband, Rashid Rajput, was deported in 2006 to his native Pakistan after an investigation by the Joint Terrorism Task Force.
 If convicted, Barrientos faces up to four years in prison.  Her next court appearance is scheduled for May 18.
 """
-print(summarizer(ARTICLE, max_length=230, min_length=30, do_sample=False))
+print(pipe(ARTICLE, max_length=230, min_length=30, do_sample=False))
