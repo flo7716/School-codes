@@ -1,6 +1,7 @@
+
 from transformers import pipeline
 
-summarizer = pipeline("summarization", model="google/pegasus-cnn_dailymail")
+pipe = pipeline("summarization", model="DISLab/SummLlama3.2-3B")
 
 ARTICLE = """ New York (CNN)When Liana Barrientos was 23 years old, she got married in Westchester County, New York.
 A year later, she got married again in Westchester County, but to a different man and without divorcing her first husband.
