@@ -30,4 +30,4 @@ Ives called Musk’s path a “Twilight Zone jigsaw puzzle.”
 
 Of course, that’s if Trump and Musk remain on good terms. Trump has a long list of former allies who fell out of favor for one reason or another. And no matter how much power and influence Musk could yield, Trump will hold the ultimate trump card: He’ll be president. 
 """
-print(summarizer(ARTICLE, max_length=230, min_length=30, do_sample=False))
+print(summarizer(ARTICLE, max_length=530, min_length=30, do_sample=False))
