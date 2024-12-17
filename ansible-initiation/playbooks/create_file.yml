@@ -1,0 +1,8 @@
+- name: Créer un fichier local
+  hosts: localhost
+  tasks:
+    - name: Créer un fichier texte
+      ansible.builtin.file:
+        path: /tmp/ansible_test.txt
+        state: touch
+        mode: '0644'

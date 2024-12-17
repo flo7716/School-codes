@@ -1,0 +1,9 @@
+- name: Installer un paquet
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Installer curl
+      ansible.builtin.apt:
+        name: curl
+        state: present
+        update_cache: yes

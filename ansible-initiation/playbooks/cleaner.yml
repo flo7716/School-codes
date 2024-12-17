@@ -1,0 +1,25 @@
+- name: Nettoyer les ressources créées
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Supprimer des fichiers
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/ansible_test.txt
+        - /tmp/ansible_write_test.txt
+
+    - name: Supprimer des utilisateurs
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - user1
+        - user2
+        - user3
+
+    - name: Désinstaller Apache
+      ansible.builtin.apt:
+        name: apache2
+        state: absent
