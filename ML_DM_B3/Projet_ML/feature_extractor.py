@@ -39,7 +39,8 @@ binary_to_letter = {
 # Générer le fichier CSV avec les coefficients et les labels binaires
 def generate_coefficients_csv():
     with open(output_file, 'w') as file:
-        file.write(",".join([f"a{i},b{i}" for i in range(num_squares**2)]) + ",label\n")
+        # En-tête du fichier CSV
+        file.write(",".join([f"a{i},fi2_{i},fi3_{i}" for i in range(num_squares**2)]) + ",label\n")
 
         for lettre in lettres:
             folder_path = os.path.join(directory_path, lettre)
@@ -55,7 +56,7 @@ def generate_coefficients_csv():
                         print(f"Impossible de charger l'image {image_path}.")
                         continue
 
-                    list_a_b = []
+                    list_features = []
                     for i in range(num_squares):
                         for j in range(num_squares):
                             x_start = i * square_size
@@ -68,16 +69,22 @@ def generate_coefficients_csv():
                                 y = np.array([y for x, y in black_pixels])
                                 model = LinearRegression()
                                 model.fit(X, y)
-                                a, b = model.coef_[0], model.intercept_
-                                list_a_b += [a, b]
+                                a = model.coef_[0]
+
+                                # Calcul des nouveaux paramètres fi2 et fi3
+                                fi2 = (2 * a) / (1 + a**2)
+                                fi3 = (1 - a**2) / (1 + a**2)
+
+                                list_features += [a, fi2, fi3]
                             else:
-                                list_a_b += [0, 0]
+                                list_features += [0, 0, 0]
 
                     # Utiliser le code binaire pour la lettre
                     binary_label = letter_to_binary(lettre)
-                    line = ",".join(map(str, list_a_b)) + f",{binary_label}\n"
+                    line = ",".join(map(str, list_features)) + f",{binary_label}\n"
                     file.write(line)
     print(f"Fichier {output_file} généré.")
+
 
 # Charger les données du CSV et entraîner le modèle avec GridSearchCV
 def train_model_with_gridsearch():
