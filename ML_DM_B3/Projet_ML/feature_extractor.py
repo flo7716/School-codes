@@ -8,7 +8,11 @@ from sklearn.metrics import classification_report
 import pandas as pd
 
 # Paramètres
-directory_path = '/home/florian-andr/Downloads/dataset(2)/dataset'
+if os.name == 'nt':
+    directory_path = 'mets ton chemin ici Hector !'
+else:
+    directory_path = '/home/florian-andr/Downloads/dataset(2)/dataset'
+
 lettres = ['b', 'f', 'g', 'h', 'j', 'k']  # Lettres à analyser
 square_size = 64
 num_squares = 8
