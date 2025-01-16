@@ -5,20 +5,23 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
+import pickle
 
-# Paramètres
-if os.name == 'nt':
-    directory_path = 'mets ton chemin ici Hector !'
-else:
-    directory_path = '/home/florian-andr/Downloads/dataset(2)/dataset'
-
-lettres = ['b', 'f', 'g', 'h', 'j', 'k']  # Lettres à analyser
+# Paramètres globaux
 square_size = 64
-num_squares = 8
 output_file = 'coefficients_letters.csv'
 
-# Fonction pour obtenir le code binaire correspondant à chaque lettre
+# Fonction de transformation des coefficients
+def transform_coefficients(a):
+    if a == 0:
+        return 0, 1
+    fi2 = (2 * a) / (1 + a**2)
+    fi3 = (1 - a**2) / (1 + a**2)
+    return fi2, fi3
+
+# Conversion lettre -> binaire
 def letter_to_binary(label):
     binary_mapping = {
         'b': '000',
@@ -28,28 +31,41 @@ def letter_to_binary(label):
         'j': '100',
         'k': '101',
     }
-    return binary_mapping.get(label, '000')  # Valeur par défaut '000' pour éviter toute erreur
+    return binary_mapping.get(label, '000')
 
-# Inverser la correspondance binaire -> lettre
-binary_to_letter = {
-    '000': 'b',
-    '001': 'f',
-    '010': 'g',
-    '011': 'h',
-    '100': 'j',
-    '101': 'k'
-}
+# Conversion binaire -> lettre
 
-# Générer le fichier CSV avec les coefficients et les labels binaires
-def generate_coefficients_csv():
+def binary_to_letter(binary):
+    # Conversion explicite du binaire en chaîne (par sécurité)
+    binary = str(binary).strip()
+
+    # Vérification des clés et recherche dans le dictionnaire
+    letter_mapping = {
+        '000': 'b',
+        '001': 'f',
+        '010': 'g',
+        '011': 'h',
+        '100': 'j',
+        '101': 'k',
+    }
+
+    # Debugging : Afficher la valeur du binaire reçu
+    print(f"Binary reçu pour conversion : '{binary}'")
+
+    # Rechercher dans le dictionnaire
+    return letter_mapping.get(binary, 'Inconnu')
+
+
+# Générer le fichier CSV avec les coefficients transformés
+def generate_coefficients_csv(dataset_path):
     with open(output_file, 'w') as file:
-        # En-tête du fichier CSV
-        file.write(",".join([f"a{i},fi2_{i},fi3_{i}" for i in range(num_squares**2)]) + ",label\n")
+        # Génération de l'en-tête CSV
+        header = [f"fi2_{i},fi3_{i}" for i in range((square_size // 8) ** 2)]  # Basé sur num_squares = 8
+        file.write(",".join(header) + ",label\n")
 
-        for lettre in lettres:
-            folder_path = os.path.join(directory_path, lettre)
-            if not os.path.exists(folder_path):
-                print(f"Le dossier {folder_path} n'existe pas.")
+        for lettre in os.listdir(dataset_path):
+            folder_path = os.path.join(dataset_path, lettre)
+            if not os.path.isdir(folder_path):
                 continue
 
             for filename in os.listdir(folder_path):
@@ -61,8 +77,8 @@ def generate_coefficients_csv():
                         continue
 
                     list_features = []
-                    for i in range(num_squares):
-                        for j in range(num_squares):
+                    for i in range(8):  # 8 sous-divisions (num_squares)
+                        for j in range(8):
                             x_start = i * square_size
                             y_start = j * square_size
                             square = image[y_start:y_start + square_size, x_start:x_start + square_size]
@@ -75,67 +91,66 @@ def generate_coefficients_csv():
                                 model.fit(X, y)
                                 a = model.coef_[0]
 
-                                # Calcul des nouveaux paramètres fi2 et fi3
-                                fi2 = (2 * a) / (1 + a**2)
-                                fi3 = (1 - a**2) / (1 + a**2)
-
-                                list_features += [a, fi2, fi3]
+                                fi2, fi3 = transform_coefficients(a)
+                                list_features += [fi2, fi3]
                             else:
-                                list_features += [0, 0, 0]
+                                list_features += [0, 0]
 
-                    # Utiliser le code binaire pour la lettre
                     binary_label = letter_to_binary(lettre)
                     line = ",".join(map(str, list_features)) + f",{binary_label}\n"
                     file.write(line)
     print(f"Fichier {output_file} généré.")
 
-
-# Charger les données du CSV et entraîner le modèle avec GridSearchCV
-def train_model_with_gridsearch():
+# Charger les données, entraîner et évaluer le modèle
+def train_and_evaluate_model():
     data = pd.read_csv(output_file)
-    X = data.iloc[:, :-1].values  # Features (les coefficients)
-    y = data.iloc[:, -1].values  # Labels binaires
+    X = data.iloc[:, :-1].values
+    y = data.iloc[:, -1].values
 
-    # Diviser en ensembles d'entraînement et de test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=2021)
 
-    # Définir les hyperparamètres à tester dans GridSearch
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
     param_grid = {
-        'hidden_layer_sizes': [(128, 64), (256, 128), (512, 256)],
-        'activation': ['relu', 'tanh'],
-        'solver': ['adam', 'sgd'],
-        'learning_rate': ['constant', 'adaptive'],
-        'max_iter': [200, 300],
-        'batch_size': [64]
+        'hidden_layer_sizes': [(64,), (64, 32), (128, 64, 32)], 
+        'activation': ['relu', 'tanh'],  
+        'solver': ['adam', 'sgd', 'lbfgs'],  
+        'alpha': [0.0001, 0.001], 
+        'learning_rate': ['constant', 'adaptive'],  
+        'max_iter': [500, 1000, 1500] 
     }
 
-    # Initialiser le classificateur MLP sans l'entraîner
-    mlp = MLPClassifier(random_state=42)
+    mlp = MLPClassifier(random_state=2021)
 
-    # GridSearch pour trouver les meilleurs paramètres
-    grid_search = GridSearchCV(mlp, param_grid, cv=3, scoring='accuracy', n_jobs=-1, verbose=2)
+    grid_search = GridSearchCV(mlp, param_grid, cv=5, scoring='f1_macro', n_jobs=-1, verbose=2)
     grid_search.fit(X_train, y_train)
 
-    # Résultats du GridSearch
-    print("Meilleurs paramètres trouvés :", grid_search.best_params_)
+    print(f"Meilleurs paramètres : {grid_search.best_params_}")
+
     best_model = grid_search.best_estimator_
 
-    # Évaluation du modèle sur l'ensemble de test
     y_pred = best_model.predict(X_test)
-    print("Rapport de classification :\n", classification_report(y_test, y_pred))
+    print("\nRapport de classification :\n", classification_report(y_test, y_pred, target_names=[f"Classe {i}" for i in range(6)]))
 
-    return best_model
+    with open("best_model.pkl", "wb") as file:
+        pickle.dump(best_model, file)
+    print("Modèle sauvegardé dans 'best_model.pkl'.")
 
-# Phase de reconnaissance avec une image utilisateur
-def recognize_user_image(image_path, model):
+# Reconnaissance d'une image utilisateur
+def recognize_user_image(image_path):
+    with open("best_model.pkl", "rb") as file:
+        model = pickle.load(file)
+
     user_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     if user_image is None:
         print(f"Erreur : Impossible de charger l'image {image_path}")
         return
 
-    user_coefficients = []
-    for i in range(num_squares):
-        for j in range(num_squares):
+    list_features = []
+    for i in range(8):
+        for j in range(8):
             x_start = i * square_size
             y_start = j * square_size
             square = user_image[y_start:y_start + square_size, x_start:x_start + square_size]
@@ -146,26 +161,27 @@ def recognize_user_image(image_path, model):
                 y = np.array([y for x, y in black_pixels])
                 model_lr = LinearRegression()
                 model_lr.fit(X, y)
-                a, b = model_lr.coef_[0], model_lr.intercept_
-                user_coefficients += [a, b]
+                a = model_lr.coef_[0]
+                fi2, fi3 = transform_coefficients(a)
+                list_features += [fi2, fi3]
             else:
-                user_coefficients += [0, 0]
+                list_features += [0, 0]
 
-    if len(user_coefficients) != len(model.coefs_[0]):
-        print(f"Erreur : le nombre de coefficients ({len(user_coefficients)}) ne correspond pas à celui attendu.")
-        return
+    X_user = np.array(list_features).reshape(1, -1)
+    predicted_binary = model.predict(X_user)[0]
 
-    user_coefficients = np.array(user_coefficients).reshape(1, -1)
-    predicted_binary = model.predict(user_coefficients)[0]
+    # Convertir la prédiction binaire en lettre
+    predicted_letter = binary_to_letter(predicted_binary)
+    print(f"Lettre prédite : {predicted_letter}")
 
-    # Convertir la valeur binaire en lettre
-    predicted_letter = binary_to_letter.get(predicted_binary, 'Inconnu')
-    print(f"La lettre prédite est : {predicted_letter}")
+# Exécution principale
+if os.name == 'nt':
+    dataset_path = 'ton chemin à mettre pour toi Hector'
+else:
+    dataset_path = '/home/florian-andr/Downloads/dataset(2)/dataset'
+generate_coefficients_csv(dataset_path)
+train_and_evaluate_model()
 
-# Exécuter les étapes
-generate_coefficients_csv()
-model = train_model_with_gridsearch()
-
-# Demander une image utilisateur
+# Reconnaissance d'une image utilisateur
 user_image_path = input("Entrez le chemin de l'image PNG à reconnaître : ")
-recognize_user_image(user_image_path, model)
+recognize_user_image(user_image_path)
