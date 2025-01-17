@@ -6,6 +6,12 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
+from PIL import ImageGrab, ImageOps
+from tkinter import *
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import filedialog
+import customtkinter as ctk
 import pandas as pd
 import pickle
 
@@ -110,15 +116,14 @@ def train_and_evaluate_model():
     X_test = scaler.transform(X_test)
 
     param_grid = {
-        'hidden_layer_sizes': [(64,), (64, 32), (128, 64, 32)], 
-        'activation': ['relu', 'tanh'],  
-        'solver': ['adam', 'sgd', 'lbfgs'],  
-        'alpha': [0.0001, 0.001], 
-        'learning_rate': ['constant', 'adaptive'],  
-        'max_iter': [500, 1000, 1500] 
+    'hidden_layer_sizes': [(128, 64, 32), (256, 128, 64)],
+    'activation': ['relu', 'tanh'],
+    'solver': ['adam'],
+    'alpha': [0.0001, 0.001],
+    'max_iter': [1000]
     }
 
-    mlp = MLPClassifier(random_state=2021)
+    mlp = MLPClassifier(random_state=42)
 
     grid_search = GridSearchCV(mlp, param_grid, cv=5, scoring='f1_macro', n_jobs=-1, verbose=2)
     grid_search.fit(X_train, y_train)
@@ -152,6 +157,10 @@ def recognize_user_image(image_path):
             y_start = j * square_size
             square = user_image[y_start:y_start + square_size, x_start:x_start + square_size]
 
+            # Vérifier les dimensions du carré
+            if square.shape[0] != square_size or square.shape[1] != square_size:
+                square = cv2.resize(square, (square_size, square_size), interpolation=cv2.INTER_AREA)
+
             black_pixels = [(x, y) for y in range(square_size) for x in range(square_size) if square[y, x] == 0]
             if black_pixels:
                 X = np.array([x for x, y in black_pixels]).reshape(-1, 1)
@@ -168,14 +177,86 @@ def recognize_user_image(image_path):
     predicted_binary = model.predict(X_user)[0]
 
     predicted_letter = binary_to_letter(predicted_binary)
-    print(f"Lettre prédite : {predicted_letter}")
+    canvas.delete("all")
+    messagebox.showinfo("Résultat", f"La lettre prédite est : {predicted_letter}")
 
 
+def lance():
+    user_image_path = save_canvas()
+    recognize_user_image(user_image_path)
 
 dataset_path = '/home/florian-andr/Downloads/dataset(2)/dataset'
 generate_coefficients_csv(dataset_path)
 train_and_evaluate_model()
 
 
-user_image_path = input("Entrez le chemin de l'image PNG à reconnaître : ")
-recognize_user_image(user_image_path)
+
+
+# -----------------------Interface graphique-----------------------
+def start_draw(event):
+    global last_x, last_y
+    last_x, last_y = event.x, event.y
+
+def draw(event):
+    global last_x, last_y
+    if last_x and last_y:
+        canvas.create_line(last_x, last_y, event.x, event.y, fill="black", width=10)
+        last_x, last_y = event.x, event.y
+
+def reset(event=None):
+    global last_x, last_y
+    last_x, last_y = None, None
+
+def save_canvas():
+    x, y, x1, y1 = canvas.winfo_rootx(), canvas.winfo_rooty(), canvas.winfo_rootx() + canvas.winfo_width(), canvas.winfo_rooty() + canvas.winfo_height()
+    image = ImageGrab.grab(bbox=(x, y, x1, y1))
+    
+    image = image.convert("RGB")
+    
+    filepath = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
+    if filepath:
+        image.save(filepath, "PNG")
+        return filepath
+
+root = ctk.CTk()
+root.title("Application de Dessin")
+root.geometry("400x400")
+root.config(bg="black")
+
+frame = ctk.CTkFrame(root, width=380, height=50, corner_radius=10)
+frame.pack(padx=5, pady=10)
+
+frame2 = ctk.CTkFrame(root, width=380, height=8, corner_radius=10)
+frame2.pack(padx=5, pady=5)
+
+frame3 = ctk.CTkFrame(root, width=380, height=100, corner_radius=10)
+frame3.pack(padx=10, pady=5)
+
+frame4 = ctk.CTkFrame(root, width=380, height=50, corner_radius=10)
+frame4.pack(padx=10, pady=5)
+
+label1 = ctk.CTkLabel(frame, width=50, corner_radius=10, text="Application de Dessin", font=("ITC Avant Garde Gothic LT Bold", 16))
+label1.pack(padx=5, pady=5)
+
+label2 = ctk.CTkLabel(frame2, width=50, corner_radius=10, text="Dessinez ici :", font=("ITC Avant Garde Gothic LT Bold", 14))
+label2.pack(padx=5, pady=5)
+
+canvas = tk.Canvas(frame3, bg="white", width=508, height=508)
+canvas.pack(padx=5, pady=5)
+
+boutton_delete = ctk.CTkButton(frame4, width=50, corner_radius=10, text="Effacer", font=("ITC Avant Garde Gothic LT Bold", 14), command=lambda: canvas.delete("all"))
+boutton_delete.grid(row=0, column=1, padx=5, pady=5)
+
+boutton_save = ctk.CTkButton(frame4, width=50, corner_radius=10, text="Reconnaître", font=("ITC Avant Garde Gothic LT Bold", 14), command=lambda: lance())
+boutton_save.grid(row=0, column=2, padx=5, pady=5)
+
+boutton_quit = ctk.CTkButton(frame4, width=50, corner_radius=10, fg_color="red", hover_color="darkred", text_color="white", text="Quitter", font=("ITC Avant Garde Gothic LT Bold", 14), command=root.quit)
+boutton_quit.grid(row=0, column=0, padx=5, pady=5)
+
+canvas.bind("<Button-1>", start_draw)
+canvas.bind("<B1-Motion>", draw)
+canvas.bind("<ButtonRelease-1>", reset)
+
+root.mainloop()
+
+
