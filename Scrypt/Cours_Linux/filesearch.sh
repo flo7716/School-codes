@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORKDIR="/Scrypt/Cours_Linux"
+WORKDIR=pwd
 
 
 for file in $(ls $WORKDIR); do
