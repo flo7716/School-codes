@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORKDIR=pwd
+WORKDIR=$(pwd)
 
 
 for file in $(ls $WORKDIR); do
