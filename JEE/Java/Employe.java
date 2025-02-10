@@ -46,7 +46,7 @@ public class Employe{
 
         Comptable c = new Comptable();
         float salaireNet = c.calculSalaireNet(Em1);
-        System.out.println("Salaire net de " + Em1.getNom() + " " + Em1.getPrenom() + " : " + salaireNet);
+        System.out.println(salaireNet);
     }
 }
 
