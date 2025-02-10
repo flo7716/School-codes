@@ -1,6 +1,6 @@
 public class Employe{
     private String nom, prenom;
-    private float salaire;
+    private double salaire;
 
     // Constructeurs
     public Employe() {}
@@ -10,7 +10,7 @@ public class Employe{
         prenom = p;
     }
 
-    public Employe(String n, String p, float s){
+    public Employe(String n, String p, double s){
         nom = n;
         prenom = p;
         salaire = s;
@@ -32,11 +32,11 @@ public class Employe{
         this.prenom = prenom;
     }
  
-    public float getSalaire() {
+    public double getSalaire() {
         return Salaire;
     }
  
-    public void setSalaire(float Salaire) {
+    public void setSalaire(double Salaire) {
         this.Salaire = Salaire;
     }
 
@@ -45,7 +45,7 @@ public class Employe{
         Employe Em2 = new Employe("Durand", "Jacques", 12000);
 
         Comptable c = new Comptable();
-        float salaireNet = c.calculSalaireNet(Em1);
+        double salaireNet = c.calculSalaireNet(Em1);
         System.out.println("Salaire net de " + Em1.getNom() + " " + Em1.getPrenom() + " : " + salaireNet);
     }
 }
