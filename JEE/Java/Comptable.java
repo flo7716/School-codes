@@ -2,7 +2,7 @@ public class Comptable {
     public Comptable(){}
 
     public float CalculSalaire(Employe e){
-        return e.getSalaire();
+        return e.getSalaire() * .76;
     }
 }
 
