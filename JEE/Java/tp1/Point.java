@@ -1,5 +1,4 @@
 package tp1;
-
 public class Point{
     private float x, y;
     public Point(float x, float y){
@@ -15,6 +14,17 @@ public class Point{
     public static void deplace(Point p, float dx, float dy){
         p.x += dx;
         p.y += dy;
+    }
+
+    public static void affiche(Point p){
+        System.out.println("Point: (" + p.x + ", " + p.y + ")");
+    }
+
+    public static void main(String[] args) {
+        Point p = new Point(0, 0);
+        initialize(p);
+        deplace(p, 1, 2);
+        affiche(p);
     }
 
 
