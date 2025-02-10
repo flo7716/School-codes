@@ -35,6 +35,11 @@ public class Employe{
     public float getSalaire() {
         return salaire;
     }
+
+    public float getSalaireNet() {
+        Comptable c = new Comptable();
+        return c.CalculSalaire(this);
+    }
  
     public void setSalaire(float Salaire) {
         this.salaire = salaire;
