@@ -45,7 +45,7 @@ public class Employe{
         Employe Em2 = new Employe("Durand", "Jacques", 12000);
 
         Comptable c = new Comptable();
-        float salaireNet = c.calculSalaireNet(Em1);
+        float salaireNet = c.CalculSalaire(Em1);
         System.out.println(salaireNet);
     }
 }
