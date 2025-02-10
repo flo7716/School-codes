@@ -19,15 +19,26 @@ public class Employe{
     public String getNom() {
         return nom;
     }
-
-    public String getPrenom() {
-        return prenom;
-    }
-
+ 
     public void setNom(String nom) {
         this.nom = nom;
     }
-
+ 
+    public String getPrenom() {
+        return prenom;
+    }
+ 
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+ 
+    public double getSalaire() {
+        return Salaire;
+    }
+ 
+    public void setSalaire(double Salaire) {
+        this.Salaire = Salaire;
+    }
 
     public static void main(String[] args) {
         Employe Em1 = new Employe("Dupont", "Pascal");
