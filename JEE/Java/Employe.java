@@ -33,11 +33,11 @@ public class Employe{
     }
  
     public float getSalaire() {
-        return Salaire;
+        return salaire;
     }
  
     public void setSalaire(float Salaire) {
-        this.Salaire = Salaire;
+        this.salaire = salaire;
     }
 
     public static void main(String[] args) {
