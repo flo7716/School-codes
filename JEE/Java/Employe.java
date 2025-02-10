@@ -43,6 +43,10 @@ public class Employe{
     public static void main(String[] args) {
         Employe Em1 = new Employe("Dupont", "Pascal", 25000);
         Employe Em2 = new Employe("Durand", "Jacques", 12000);
+
+        Comptable c = new Comptable();
+        float salaireNet = c.calculSalaireNet(Em1);
+        System.out.println("Salaire net de " + Em1.getNom() + " " + Em1.getPrenom() + " : " + salaireNet);
     }
 }
 
