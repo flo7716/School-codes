@@ -1,10 +1,8 @@
 public class Comptable {
     public Comptable(){}
-
-    public float CalculSalaire(Employe e){
-        return e.getSalaire();
-    }
 }
 
-
+public float CalculSalaire(Employe e){
+        return e.getSalaire();
+    }
 

@@ -15,6 +15,11 @@ public class Employe{
         prenom = p;
         salaire = s;
     }
+
+    public static void main(String[] args) {
+        Em1 = Employe("Dupont", "Pascal");
+        Em2 = Employe("Durand", "Jacques", 12000);
+    }
 }
 
 
