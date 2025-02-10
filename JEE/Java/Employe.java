@@ -41,7 +41,7 @@ public class Employe{
     }
 
     public static void main(String[] args) {
-        Employe Em1 = new Employe("Dupont", "Pascal");
+        Employe Em1 = new Employe("Dupont", "Pascal", 25000);
         Employe Em2 = new Employe("Durand", "Jacques", 12000);
     }
 }
