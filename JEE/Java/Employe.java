@@ -16,6 +16,19 @@ public class Employe{
         salaire = s;
     }
 
+    public String getNom() {
+        return nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+
     public static void main(String[] args) {
         Employe Em1 = new Employe("Dupont", "Pascal");
         Employe Em2 = new Employe("Durand", "Jacques", 12000);
