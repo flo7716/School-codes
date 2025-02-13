@@ -40,6 +40,10 @@ public class Point{
         return this.y;
     }
 
+    public boolean equals(Point p){
+        return this.x == p.x && this.y == p.y;
+    }
+
     public static void main(String[] args) {
         int n;
         char last;
@@ -62,6 +66,19 @@ public class Point{
         System.out.println(n);
         last = ch.charAt(n-1);
         System.out.println(last);
+
+
+
+        String ch1 = "Hello";
+        String ch2 = "Hello";
+
+        System.out.println(ch1.equals(ch2));
+        System.out.println(ch1.equals("Hello"));
+
+        Point p4 = new Point(10, 20);
+        Point p5 = new Point(10, 20);
+        System.out.println(p4.equals(p5));
+
     }
 
 
