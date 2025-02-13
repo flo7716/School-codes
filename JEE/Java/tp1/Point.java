@@ -79,6 +79,19 @@ public class Point{
         Point p5 = new Point(10, 20);
         System.out.println(p4.equals(p5));
 
+
+        String ch3 = "Anticonstitutionnellement";
+        char tab[] = {'a', 'e', 'i', 'o', 'u', 'y'};
+        for(char elem : tab){
+            int cpt = 0;
+            for(int i = 0; i < ch3.length(); i++){
+                if(ch3.charAt(i) == elem){
+                    cpt++;
+                }
+            }
+            System.out.println(elem + " : " + cpt);
+        }
+
     }
 
 
