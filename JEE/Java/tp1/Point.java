@@ -1,4 +1,3 @@
-package tp1;
 public class Point{
     private float x, y;
     public Point(float x, float y){
@@ -42,6 +41,8 @@ public class Point{
     }
 
     public static void main(String[] args) {
+        int n;
+        char last;
         Point p1 = new Point(0, 0);
         Point p2 = new Point(p1);
         Point p3 = new Point();
@@ -56,6 +57,11 @@ public class Point{
         p1.affiche();
         p2.affiche();
         p3.affiche();
+        String ch = "Bonjour";
+        n = ch.length();
+        System.out.println(n);
+        last = ch.charAt(n-1);
+        System.out.println(last);
     }
 
 
