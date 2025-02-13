@@ -1,0 +1,15 @@
+public class CalcTableau {
+    public static double somme(double[] tab) {
+        double somme = 0;
+        for (double e : tab) {
+            somme += e;
+        }
+        return somme;
+    }
+
+    public static void main(String[] args) {
+        double[] tab = {1.2,5.5,7.1};
+        double Resultat = CalcTableau.somme(tab);
+        System.out.println(Resultat);
+    }
+}
