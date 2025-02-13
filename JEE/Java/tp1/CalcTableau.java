@@ -18,5 +18,10 @@ public class CalcTableau {
         double[] tab = {1.2,5.5,7.1};
         double Resultat = CalcTableau.somme(tab);
         System.out.println(Resultat);
+
+        CalcTableau.increment(tab, 10);
+        for (Object e : tab) {
+            System.out.println(e);
+        }
     }
 }
