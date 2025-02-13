@@ -6,6 +6,15 @@ public class MoyenneTable {
         }
     }
 
+    @Override
+    public String toString(){
+        String s = "";
+        for (double e : this.tab){
+            s += e + " ";
+        }
+        return s;
+    }
+
 
 
     public static void main(String[] args){
