@@ -7,6 +7,13 @@ public class CalcTableau {
         return somme;
     }
 
+    public static double[] increment(double[] tab, double val) {
+        for (int i = 0; i < tab.length; i++) {
+            tab[i] += val;
+        }
+        return tab;
+    }
+
     public static void main(String[] args) {
         double[] tab = {1.2,5.5,7.1};
         double Resultat = CalcTableau.somme(tab);
