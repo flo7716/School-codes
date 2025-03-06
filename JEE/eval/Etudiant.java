@@ -1,4 +1,4 @@
-
+package eval;
 import java.util.Arrays;
 
 public class Etudiant {
@@ -18,6 +18,14 @@ public class Etudiant {
         this.numero = nbretucrees;
         this.notes = new int[courssuivis.length];
         Arrays.fill(this.notes, 0);
+    }
+
+
+    public static void main(String[] args) {
+        Etudiant e1 = new Etudiant("Dupont", "Jean", new String[]{"Math", "Physique", "Anglais"});
+        Etudiant e2 = new Etudiant("André","Florian", new String[]{"SVT", "Français", "Programmation"});
+        System.out.println(e1.nom + " " + e1.prenom + " " + e1.numero);
+        System.out.println(e2.nom + " " + e2.prenom + " " + e2.numero);
     }
 
 
