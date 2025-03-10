@@ -1,19 +1,18 @@
 public class Produit {
-    private static int compteur = 0;
-    private int ref;
+    private static int ref = 0;
     private String desig;
     private double pnx;
     private int q;
     
     private Produit(String desig, double pnx, int q) {
-        this.ref = compteur++;
+        this.ref = ref++;
         this.desig = desig;
         this.pnx = pnx;
         this.q = q;
     }
     
     public static Produit creerProduit(String desig, double pnx, int q) {
-        if (compteur < 10) return new Produit(desig, pnx, q);
+        if (ref < 10) return new Produit(desig, pnx, q);
         else return null;
     }
 
