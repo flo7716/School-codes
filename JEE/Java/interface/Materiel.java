@@ -42,6 +42,13 @@ public class Materiel {
         Nature = nature;
     }
 
+    public static void main(String[] args) {
+        Materiel materiel = new Materiel("Ordinateur", 100, 10);
+        System.out.println("Designation: " + materiel.getDesignation());
+        System.out.println("Prix unitaire: " + materiel.getPrixUnitaire());
+        System.out.println("Quantite: " + materiel.getQuantite());
+    }
+
     
 
     

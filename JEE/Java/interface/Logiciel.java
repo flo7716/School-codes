@@ -43,5 +43,12 @@ public class Logiciel {
     }
 
 
-    
+    public static void main(String[] args) {
+        Logiciel logiciel = new Logiciel("Windows 10", 100, 10, "Microsoft", "2015");
+        System.out.println("Designation: " + logiciel.getDesignation());
+        System.out.println("Prix unitaire: " + logiciel.getPrixUnitaire());
+        System.out.println("Quantite: " + logiciel.getQuantite());
+        System.out.println("Editeur: " + logiciel.getEditeur());
+        System.out.println("Annee d'edition: " + logiciel.getAnneeEdition());
+    }
 }
