@@ -1,4 +1,4 @@
-public class Logiciel {
+public class Logiciel implements Produit{
     private String Designation;
     private float PrixUnitaire;
     private float Quantite;

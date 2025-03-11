@@ -1,4 +1,4 @@
-public class Materiel {
+public class Materiel implements Produit{
     private String Designation;
     private float PrixUnitaire;
     private float Quantite;
