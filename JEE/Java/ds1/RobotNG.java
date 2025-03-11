@@ -1,86 +1,52 @@
 package ds1;
 
 public class RobotNG extends Robot {
-    private String Mode;
-    private int pas;
+    private boolean turbo;
 
-    public RobotNG(String nom, String mode) {
+    public RobotNG(String nom, boolean turbo) {
         super(nom);
-        Mode = mode;
+        this.turbo = turbo;
     }
 
-    
-
-    public String getMode() {
-        return Mode;
+    public boolean isTurbo() {
+        return turbo;
     }
 
-
-
-    public void setMode(String mode) {
-        Mode = mode;
+    public void setTurbo(boolean turbo) {
+        this.turbo = turbo;
     }
-
-
 
     public void avance(int pas){
-        if(getDirection() == "Est"){
-            super.x += pas;
+        if (turbo) {
+            pas *= 3;
         }
-        if(getDirection() == "Ouest"){
-            super.x -= pas;
-        }
-        if(getDirection() == "Nord"){
-            super.y += pas;
-        }
-        else{
-            super.y -= pas;
+        for(int i = 0; i < pas; i++){
+            super.avance();
         }
     }
-
 
     public void gauche(){
-        if(getDirection() == "Est"){
-            this.setDirection("Nord");
-        }
-        if(getDirection() == "Ouest"){
-            this.setDirection("Sud");
-        }
-        if(getDirection() == "Nord"){
-            this.setDirection("Ouest");
-        }
-        else{
-            this.setDirection("Est");
+        for (int i = 0; i < 3; i++) {
+            super.droite();
         }
     }
+
 
     public void demiTour(){
-        if(getDirection() == "Est"){
-            this.setDirection("Ouest");
-        }
-        if(getDirection() == "Ouest"){
-            this.setDirection("Est");
-        }
-        if(getDirection() == "Nord"){
-            this.setDirection("Sud");
-        }
-        else{
-            this.setDirection("Nord");
-        }
-    }
-
-    public void activation_Turbo(RobotNG robot){
-        if(robot.getMode() == "Normal"){
-            robot.setMode("Turbo");
-            robot.getMode();
+        for (int i = 0; i < 2; i++) {
+            super.droite();
         }
     }
 
 
     public static void main(String[] args) {
-        RobotNG
+        RobotNG r = new RobotNG("R2D2", true);
+        r.avance(3);
+        System.out.println(r);
+        r.gauche();
+        System.out.println(r);
+        r.demiTour();
+        System.out.println(r);
     }
-
-
 
 }

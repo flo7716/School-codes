@@ -4,8 +4,8 @@ public class Position{
 
 
     public Position(float x, float y) {
-        this.x = 0;
-        this.y = 0;
+        this.x = x;
+        this.y = y;
     }
 
     
@@ -34,9 +34,12 @@ public class Position{
 
 
 
-    public static void main(String[] args) {
-        
+    @Override
+    public String toString() {
+        return "Position [x=" + x + ", y=" + y + "]";
     }
+
+    
 
     
 }

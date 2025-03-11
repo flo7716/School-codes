@@ -1,8 +1,7 @@
 package ds1;
 public class Robot {
     private String nom;
-    public float x;
-    public float y;
+    Position position;
     private String direction;
     public String getNom() {
         return nom;
@@ -12,64 +11,66 @@ public class Robot {
 
     public Robot(String nom) {
         this.nom = nom;
-        this.x = 0;
-        this.y = 0;
+        this.position = new Position(0, 0);
         this.direction = "Est";
     }
 
-
+    
 
     public void setNom(String nom) {
         this.nom = nom;
     }
-    public float getX() {
-        return x;
-    }
-    public void setX(float x) {
-        this.x = x;
-    }
-    public float getY() {
-        return y;
-    }
-    public void setY(float y) {
-        this.y = y;
-    }
+
+
+
     public String getDirection() {
         return direction;
     }
+
+
+
     public void setDirection(String direction) {
         this.direction = direction;
     }
 
+
+
     public void avance(){
-        if(getDirection() == "Est"){
-            this.x++;
+        if(this.direction == "Est"){
+            this.position.setY(this.position.getY() + 1);
         }
-        if(getDirection() == "Ouest"){
-            this.x--;
+        if(this.direction == "Ouest"){
+            this.position.setY(this.position.getY() - 1);
         }
-        if(getDirection() == "Nord"){
-            this.y++;
+        if(this.direction == "Nord"){
+            this.position.setX(this.position.getX() + 1);
         }
         else{
-            this.y--;
+            this.position.setX(this.position.getX() - 1);
         }
     }
 
     public void droite(){
-        if(getDirection() == "Est"){
-            this.setDirection("Sud");
+        if(this.direction == "Est"){
+            this.direction = "Sud";
         }
-        if(getDirection() == "Ouest"){
-            this.setDirection("Nord");
+        if(this.direction == "Ouest"){
+            this.direction = "Nord";
         }
-        if(getDirection() == "Nord"){
-            this.setDirection("Est");
+        if(this.direction == "Nord"){
+            this.direction = "Est";
         }
         else{
-            this.setDirection("Ouest");
+            this.direction = "Ouest";
         }
     }
+
+    @Override
+    public String toString() {
+        return "Robot [nom=" + nom + ", position=" + position + ", direction=" + direction + "]";
+    }
+
+
 
     public static void main(String[] args) {
         Robot r1 = new Robot("R1");
@@ -78,10 +79,10 @@ public class Robot {
         r1.avance();
         r2.avance();
         r1.droite();
-        r1.getX();
-        r1.getY();
-        r2.getX();
-        r2.getY();
+        r1.position.getX();
+        r1.position.getY();
+        r2.position.getX();
+        r2.position.getY();
     }
 
 }
