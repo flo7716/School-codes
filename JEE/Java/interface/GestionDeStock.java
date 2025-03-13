@@ -14,4 +14,24 @@ public class GestionDeStock {
             }
         }
     }
+
+    public void MaJ(String designation, float prixUnitaire, float quantite, char nature, String editeur, String anneeEdition) {
+        for (Produit p : stock) {
+            if (p.getDesignation().equals(designation)) {
+                p = new Logiciel(designation, prixUnitaire, quantite, nature, editeur, anneeEdition);
+                return;
+            }
+        }
+        System.out.println("Produit non trouvé.");
+    }
+
+    public void supprimer(String designation) {
+        for (Produit p : stock) {
+            if (p.getDesignation().equals(designation)) {
+                stock.remove(p);
+                return;
+            }
+        }
+        System.out.println("Produit non trouvé.");
+    }
 }
