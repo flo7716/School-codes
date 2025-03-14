@@ -34,6 +34,9 @@ public class GestionDeStock {
         gds.ajouter(new Materiel("Souris", 10, 100));
         gds.ajouter(new Materiel("Clavier", 20, 50));
         gds.ajouter(new Logiciel("Windows", 100, 10, "Microsoft", 2018));
+        gds.ajouter(new Logiciel("Office", 200, 5, "Microsoft", 2019));
+        gds.updater(new Materiel("Souris", 10, 100), new Materiel("Souris", 10, 200));
+        gds.supprimer(new Materiel("Clavier", 20, 50));
         gds.lister();
     }
 }
