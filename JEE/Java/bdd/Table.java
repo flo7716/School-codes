@@ -1,34 +1,22 @@
-import java.util.ArrayList;
-import java.util.List;
 public class Table {
-    private String nom;
-    private List<Champ> champs;
-    private List<Tuple> tuples;
-    
-    public Table(String nom) {
-        this.nom = nom;
-        this.champs = new ArrayList<>();
-        this.tuples = new ArrayList<>();
+    private structure structure;
+    private data data;
+    public Table(structure structure, data data) {
+        this.structure = structure;
+        this.data = data;
     }
-    
-    public void ajouterChamp(Champ champ) {
-        champs.add(champ);
+    public structure getStructure() {
+        return structure;
     }
-    
-    public void ajouterTuple(Tuple tuple) {
-        tuples.add(tuple);
+    public void setStructure(structure structure) {
+        this.structure = structure;
     }
-    
-    public void afficherStructure() {
-        System.out.println("Table: " + nom);
-        for (Champ champ : champs) {
-            System.out.println("Champ: " + champ.getNom() + ", Type: " + champ.getType() + ", Longueur: " + champ.getLongueur());
-        }
+    public data getData() {
+        return data;
     }
-    
-    public void afficherDonnees() {
-        for (Tuple tuple : tuples) {
-            System.out.println(tuple.getValeurs());
-        }
+    public void setData(data data) {
+        this.data = data;
     }
+
+    
 }
