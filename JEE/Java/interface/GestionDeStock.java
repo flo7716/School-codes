@@ -16,8 +16,13 @@ public class GestionDeStock {
         }
     }
 
-    public void updater(Produit p, String designation, float prixUnitaire, float quantite) {
-        p = new Produit(designation, prixUnitaire, quantite);
+    public void updater(Produit p, Produit updatedProduit) {
+        for (int i = 0; i < stock.size(); i++) {
+            if (stock.get(i).equals(p)) {
+                stock.set(i, updatedProduit);
+                break;
+            }
+        }
     }
 
     public void supprimer(Produit p) {
