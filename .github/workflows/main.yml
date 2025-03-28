@@ -19,5 +19,5 @@ jobs:
         GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
       run: |
         git remote add gitlab https://gitlab.com/florian.andre.77/School-codes.git
-        git fetch --unshallow  # Convert to a complete repository
+        git fetch  # Removed --unshallow option
         git push gitlab --all
