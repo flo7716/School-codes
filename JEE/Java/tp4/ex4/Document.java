@@ -1,7 +1,7 @@
 import java.util.Date;
 
 // Classe de base pour un Document
-abstract class Document {
+public abstract class Document {
     protected String code;
     protected String discipline;
     protected String theme;
