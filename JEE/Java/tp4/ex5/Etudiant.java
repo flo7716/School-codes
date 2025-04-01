@@ -69,7 +69,7 @@ public class Etudiant {
     }
 
     public void afficherDetails() {
-        System.out.println("Étudiant: " + nom + " " + prenom);
+        System.out.println("Étudiant: " + getNom() + " " + getPrenom() + " (ID: " + getId() + ")");
         System.out.println("Modules inscrits:" + getModulesInscrits());
     }
 
