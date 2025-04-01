@@ -11,9 +11,7 @@ public class Adherent {
         this.email = email;
     }
     
-    public void afficherDetails() {
-        System.out.println("Adhérent: " + nom + " " + prenom + " (" + email + ")");
-    }
+    
 
     public String getCode() {
         return code;
@@ -45,6 +43,10 @@ public class Adherent {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void afficherDetails() {
+        System.out.println("Adhérent: " + getNom() + " " + getPrenom() + " (" + getEmail() + ")");
     }
 
     public static void main(String[] args) {
