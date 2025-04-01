@@ -5,20 +5,19 @@ public class Livre extends Document{
     private List<String> auteurs;
     private String maisonEdition;
     private String isbn;
+    private int nombreExemplaires;
+    private int numeroInventaire;
 
-    public Livre(String code, String discipline, String theme, Date dateEdition, String langue, int nombreExemplaires, List<String> auteurs, String maisonEdition, String isbn) {
-        super(code, discipline, theme, "Livre", dateEdition, langue, nombreExemplaires);
+    public Livre(String code, String discipline, String theme, String type, Date dateEdition, String langue,
+            int nombreExemplaires, List<String> auteurs, String maisonEdition, String isbn, int nombreExemplaires2,
+            int numeroInventaire) {
+        super(code, discipline, theme, type, dateEdition, langue, nombreExemplaires);
         this.auteurs = auteurs;
         this.maisonEdition = maisonEdition;
         this.isbn = isbn;
+        this.nombreExemplaires = nombreExemplaires;
+        this.numeroInventaire = numeroInventaire;        
     }
-
-    @Override
-    public void afficherDetails() {
-        System.out.println("Livre: " + theme + " - " + maisonEdition + " (ISBN: " + isbn + ")");
-    }
-
-    
 
     public List<String> getAuteurs() {
         return auteurs;
@@ -44,8 +43,25 @@ public class Livre extends Document{
         this.isbn = isbn;
     }
 
-    public static void main(String[] args) {
-        Livre livre = new Livre("L001", "Informatique", "Java", new Date(), "Français", 5, List.of("John Doe", "Jane Doe"), "Edition A", "1234567890");
-        livre.afficherDetails();
+    public int getNombreExemplaires() {
+        return nombreExemplaires;
     }
+
+    public void setNombreExemplaires(int nombreExemplaires) {
+        this.nombreExemplaires = nombreExemplaires;
+    }
+
+    public int getNumeroInventaire() {
+        return numeroInventaire;
+    }
+
+    public void setNumeroInventaire(int numeroInventaire) {
+        this.numeroInventaire = numeroInventaire;
+    }
+
+    
+
+    
+
+    
 }

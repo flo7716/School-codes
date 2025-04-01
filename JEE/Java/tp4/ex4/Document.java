@@ -21,6 +21,4 @@ public abstract class Document {
         this.nombreExemplaires = nombreExemplaires;
         this.exemplairesDisponibles = nombreExemplaires;
     }
-    
-    public abstract void afficherDetails();
 }

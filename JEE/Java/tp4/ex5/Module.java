@@ -28,16 +28,7 @@ public class Module {
         }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Module{");
-        sb.append("code=").append(code);
-        sb.append(", nom=").append(nom);
-        sb.append(", elements=").append(elements);
-        sb.append('}');
-        return sb.toString();
-    }
+
 
     public static void main(String[] args) {
         Module module = new Module("INFO1", "Informatique 1");
@@ -49,9 +40,6 @@ public class Module {
 
         module.afficherDetails();
     }
-
-    
-
     
 }
 
