@@ -3,15 +3,17 @@ public class Adherent {
     private String nom;
     private String prenom;
     private String email;
-    
-    public Adherent(String code, String nom, String prenom, String email) {
+    private Privilege privilege;
+    private Emprunt[] emprunts;
+
+    public Adherent(String code, String nom, String prenom, String email, Privilege privilege, Emprunt[] emprunts) {
         this.code = code;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
+        this.privilege = privilege;
+        this.emprunts = emprunts;
     }
-    
-    
 
     public String getCode() {
         return code;
@@ -45,12 +47,29 @@ public class Adherent {
         this.email = email;
     }
 
-    public void afficherDetails() {
-        System.out.println("Adhérent: " + getNom() + " " + getPrenom() + " (" + getEmail() + ")");
+    public Privilege getPrivilege() {
+        return privilege;
     }
 
-    public static void main(String[] args) {
-        Adherent adherent = new Adherent("A001", "Doe", "John", "john.doe@example.com");
-        adherent.afficherDetails();
+    public void setPrivilege(Privilege privilege) {
+        this.privilege = privilege;
     }
+
+    public Emprunt[] getEmprunts() {
+        return emprunts;
+    }
+
+    public void setEmprunts(Emprunt[] emprunts) {
+        this.emprunts = emprunts;
+    }
+    
+    public static void main(String[] args) {
+        Adherent adherent = new Adherent("A001", "Doe", "John", "john.doe@example.com", new Privilege("Prof", 10, 14), new Emprunt[0]);
+        System.out.println("Adhérent: " + adherent.getNom() + " " + adherent.getPrenom() + " (Code: " + adherent.getCode() + ")" + 
+                           ", Email: " + adherent.getEmail() + 
+                           ", Privilège: " + adherent.getPrivilege().getNom() + 
+                           ", Documents possibles: " + adherent.getPrivilege().getNb_docs_possibles() + 
+                           ", Jours max d'emprunt: " + adherent.getPrivilege().getNb_jours_max_emprunt());
+    }
+    
 }
