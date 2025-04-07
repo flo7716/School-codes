@@ -10,7 +10,7 @@ load_dotenv()
 weaviate_url = os.getenv("WEAVIATE_URL")
 weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
 
-# Connect to Weaviate Cloud
+# Connect to Weaviate Cloud (test)
 try:
     client = weaviate.connect_to_weaviate_cloud(
         cluster_url=weaviate_url,
@@ -21,4 +21,3 @@ try:
     client.close()
 except Exception as e:
     print("Error connecting to Weaviate Cloud:", e)
-
