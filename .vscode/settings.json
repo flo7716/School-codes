@@ -27,5 +27,6 @@
             "database": "parc_info",
             "askForPassword": true
         }
-    ]
+    ],
+    "java.compile.nullAnalysis.mode": "automatic"
 }
