@@ -1,11 +1,13 @@
 package com.example.demo.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.model.Student;
 import com.example.demo.service.StudentService;
@@ -29,5 +31,14 @@ public class StudentController {
         return "index";
     }
     
+
+    @GetMapping("/traiter-formulaire")
+    public String afficherEtudiant(Model model, @RequestParam("nom") String nom){
+        List<Student> list_s = studentService.findByName(nom);
+        for (Student student : list_s) {
+            System.out.println(student);
+        }
+        return "index";
+    }
 
 }

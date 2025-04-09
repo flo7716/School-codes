@@ -50,7 +50,8 @@ public class Student {
         this.age = age;
     }
 
-
+    public Student() {
+    }
 
     private int calculateAge(LocalDate dob) {
         return Period.between(dob, LocalDate.now()).getYears();

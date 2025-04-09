@@ -2,24 +2,49 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Bonjour !</title>
+    <title>Formulaire Bonjour</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
+            background-color: #e6f2ff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
-        h1 {
-            color: #333;
-            font-size: 4rem;
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 0.5rem;
+            font-size: 1rem;
+            width: 80%;
+            margin-bottom: 1rem;
+        }
+        input[type="submit"] {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
-    <h1>Bonjour !</h1>
+    <div class="container">
+        <h1>Bonjour !</h1>
+        <form action="/traiter-formulaire" method="GET">
+            <input type="text" name="nom" placeholder="Entrez votre nom" required>
+            <br>
+            <input type="submit" value="Envoyer">
+        </form>
+    </div>
 </body>
 </html>
