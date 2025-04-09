@@ -41,6 +41,17 @@ public class Student {
         this.age = calculateAge(dob);
     }
 
+    
+
+    public Student(String name, String email, LocalDate dob, int age) {
+        this.name = name;
+        this.email = email;
+        this.dob = dob;
+        this.age = age;
+    }
+
+
+
     private int calculateAge(LocalDate dob) {
         return Period.between(dob, LocalDate.now()).getYears();
     }
