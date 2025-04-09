@@ -24,7 +24,7 @@ public class StudentController {
     @GetMapping("/")
     public String home(Model model){
         Student s1 = new Student("Florian","florian.andre.77@gmail.com", LocalDate.of(2002, 02, 03), 23);
-        studentService.findByName("Florian");
+        System.out.println(studentService.findByName("Florian"));
         return "index";
     }
     

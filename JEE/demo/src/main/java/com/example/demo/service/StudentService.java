@@ -21,9 +21,8 @@ public class StudentService {
         return studentrepository.findByName(name);
     }
 
-    public List<Student> saveStudent(Student student) {
-        studentrepository.save(student);
-        return studentrepository.findByName(student.getName());
+    public Student saveStudent(Student student) {
+        return studentrepository.save(student);
     }
 
 }
