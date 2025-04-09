@@ -15,5 +15,6 @@ public interface StudentRepository extends CrudRepository<Student, Integer>{
     public List<Student> findByEmail(String email);
     public List<Student> findByDob(LocalDate dob);
     public List<Student> findByAge(int age);
+    
 
 }
