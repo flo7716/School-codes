@@ -21,7 +21,7 @@ public class StudentController {
     @GetMapping("/")
     public String home(Model model){
         System.out.println("home");
-        return "index";
+        return "home";
     }
     
 
