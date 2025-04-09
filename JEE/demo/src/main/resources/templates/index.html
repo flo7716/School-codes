@@ -8,10 +8,11 @@
             font-family: Arial, sans-serif;
             background-color: #e6f2ff;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding-top: 2rem;
         }
         .container {
             background: white;
@@ -19,6 +20,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            margin-bottom: 2rem;
         }
         input[type="text"] {
             padding: 0.5rem;
@@ -35,16 +37,57 @@
             border: none;
             border-radius: 6px;
         }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 800px;
+            margin-top: 1rem;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Bonjour !</h1>
-        <form action="/traiter-formulaire" method="GET">
+        <form action="/traiter-formulaire" method="POST">
             <input type="text" name="nom" placeholder="Entrez votre nom" required>
             <br>
             <input type="submit" value="Envoyer">
         </form>
     </div>
+
+    <h2>Liste des étudiants</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Date de naissance</th>
+                <th>Âge</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="student" items="${students}">
+                <tr>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.dob}</td>
+                    <td>${student.age}</td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
 </body>
 </html>
