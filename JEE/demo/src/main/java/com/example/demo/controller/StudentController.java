@@ -33,9 +33,9 @@ public class StudentController {
     
 
     @GetMapping("/traiter-formulaire")
-    public String afficherEtudiant(Model model, @RequestParam("nom") String nom){
+    public String afficherEtudiant(Model model, @RequestParam("nom") String nom) {
         List<Student> list_s = studentService.findByName(nom);
-        model.addAttribute("id", list_s);
+        model.addAttribute("students", list_s); // Use "students" as the key
         return "index";
     }
 
