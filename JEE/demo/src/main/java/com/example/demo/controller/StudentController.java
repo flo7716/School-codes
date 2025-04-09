@@ -20,8 +20,8 @@ public class StudentController {
 
     @GetMapping("/")
     public String home(Model model){
-        System.out.println("home");
-        return "home";
+        studentService.findByName("Florian");
+        return "index";
     }
     
 
