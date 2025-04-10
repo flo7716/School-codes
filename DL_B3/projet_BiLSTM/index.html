@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            height: 100vh;
+            justify-content: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        #chatbox {
+            width: 300px;
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: white;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .message {
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #d1f7d1;
+            margin-left: auto;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #f1f1f1;
+            margin-right: auto;
+        }
+        input[type="text"] {
+            width: 250px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 500px;
+        }
+        .chat-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Chatbot</h2>
+    <div class="chat-container">
+        <div id="chatbox">
+            <!-- Les messages s'affichent ici -->
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="userInput" placeholder="Posez une question..." />
+            <button onclick="sendMessage()">Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour ajouter un message à l'interface
+        function appendMessage(message, sender = 'user') {
+            const chatbox = document.getElementById('chatbox');
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+            msgDiv.textContent = message;
+            chatbox.appendChild(msgDiv);
+            chatbox.scrollTop = chatbox.scrollHeight; // Pour faire défiler le chat vers le bas
+        }
+
+        // Fonction pour simuler l'envoi du message
+        function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            if (userInput.trim() === '') return; // Si aucun texte n'est saisi, ne rien faire
+
+            appendMessage(userInput, 'user'); // Ajouter le message de l'utilisateur
+
+            document.getElementById('userInput').value = ''; // Réinitialiser le champ de saisie
+
+            // Simuler une réponse du chatbot
+            setTimeout(() => {
+                appendMessage("Réponse générée par le bot: " + userInput, 'bot'); // Réponse du bot
+            }, 1000); // Simule un délai avant de répondre
+        }
+    </script>
+
+</body>
+</html>
