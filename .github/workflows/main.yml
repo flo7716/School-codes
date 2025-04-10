@@ -22,5 +22,7 @@ jobs:
         git remote add gitlab https://florian.andre.77:${{ secrets.GITLAB_TOKEN }}@gitlab.com/florian.andre.77/School-codes.git
         
     - name: Force push to GitLab
-      run: git push --force gitlab main
+      run: |
+        git pull
+        git push --force gitlab main
 
