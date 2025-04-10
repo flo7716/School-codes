@@ -21,5 +21,8 @@ jobs:
         git config --global user.email 'florian.andre.77@gmail.com'
         git remote add gitlab https://florian.andre.77:${{ secrets.GITLAB_TOKEN }}@gitlab.com/florian.andre.77/School-codes.git
         
-    - name: Force push to GitLab
-      run: git push --force gitlab main
+    - name: Pull and push to GitLab
+      run: |
+        git pull gitlab main --rebase
+        git push gitlab main
+
