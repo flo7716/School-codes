@@ -54,9 +54,9 @@ Etudiant Saisir_1_etudiant() {
         scanf("%d", &val_genre);
     } while (val_genre != 1 && val_genre != 2);
     if(val_genre==1)
-        e.Genre="Homme";
+        e.Genre = 1;
     else
-        e.Genre="Femme";
+        e.Genre = 2;
 
     do
     {
@@ -84,20 +84,20 @@ Etudiant Saisir_1_etudiant() {
        scanf("%d",&choix_asso);
     }while(choix_asso<1||choix_asso>3);
     if(choix_asso==1)
-        e.Assos="Sportive";
+        e.Assos = 1;
     else if(choix_asso==2)
-        e.Assos="Artistique";
+        e.Assos = 2;
     else
-        e.Assos="Technique";
+        e.Assos = 3;
     do
     {
         printf("\nSaisissez votre cursus : 1 = Bachelor, 2 = Aero : ");
         scanf("%d",&choix_cursus);
     }while(choix_cursus<1||choix_cursus>2);
     if(choix_cursus==1)
-        e.Cursus="Bachelor";
+        e.Cursus = 1;
     else
-        e.Cursus="Ingenieur";
+        e.Cursus = 2;
     do
     {
         printf("\nSaisissez votre mail (40 caracteres maximum) : ");
@@ -120,7 +120,7 @@ void afficher_1_etudiant(Etudiant e, int i) {
     printf("\n-------------------------");
     printf("\n--------ETUDIANT %d---------", i+1);
     printf("\n-------------------------");
-    printf("\nGenre            : %s",e.Genre);
+    printf("\nGenre            : %s", (e.Genre == 1) ? "Homme" : "Femme");
     printf("\nNom              : %s", e.Nom);
     printf("\nPrenom           : %s", e.Prenom);
 
@@ -128,8 +128,8 @@ void afficher_1_etudiant(Etudiant e, int i) {
     Date Date_n = e.Date_n;
 
     printf("\nDate de naissance: %d/%d/%d", Date_n.Jour, Date_n.Mois, Date_n.Annee);
-    printf("\nAssos            : %s", e.Assos);
-    printf("\nCursus           : %s", e.Cursus);
+    printf("\nAssos            : %s", (e.Assos == 1) ? "Sportive" : (e.Assos == 2) ? "Artistique" : "Technique");
+    printf("\nCursus           : %s", (e.Cursus == 1) ? "Bachelor" : "Ingenieur");
     printf("\nMail             : %s", e.Mail);
     printf("\nTelephone        : %s", e.Telephone);
     printf("\n-------------------------");
