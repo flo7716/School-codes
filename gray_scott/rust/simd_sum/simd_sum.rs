@@ -23,3 +23,9 @@ fn simd_sum(v: &Vec<f32>) -> f32 {
     let scalar_sum = peel.into_iter().chain(tail).sum::<f32>();
     simd_sum.reduce_sum() + scalar_sum
 }
+
+fn main() {
+    let v = vec![1.2, 3.4, 5.6, 7.8, 9.0, 11.2, 13.4, 15.6];
+    let result = simd_sum(&v);
+    println!("{:?}", result);
+}
