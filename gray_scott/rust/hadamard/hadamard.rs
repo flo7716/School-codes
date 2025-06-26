@@ -12,3 +12,10 @@ assert_eq!(
         5.6 * 5.4
     ]
 );
+
+fn main() {
+    let v1 = vec![1.2, 3.4, 5.6];
+    let v2 = vec![9.8, 7.6, 5.4];
+    let result = hadamard(v1, v2);
+    println!("{:?}", result);
+}
