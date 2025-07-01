@@ -1,7 +1,0 @@
-## Notre fichier contient des dépendances pour le projet de vectorisation du texte avec Weaviate
-
-weaviate-client
-numpy
-pandas
-sentence-transformers
-scikit-learn

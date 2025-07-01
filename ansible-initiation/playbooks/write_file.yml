@@ -1,8 +1,0 @@
-- name: Écrire dans un fichier
-  hosts: localhost
-  tasks:
-    - name: Ajouter du contenu dans un fichier
-      ansible.builtin.copy:
-        content: "Ceci est une ligne ajoutée par Ansible."
-        dest: /tmp/ansible_write_test.txt
-        mode: '0644'
