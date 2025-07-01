@@ -33,6 +33,7 @@ int grid(int row, int column) {
         }
         std::cout << std::endl;
     }
+    return 0;
 }
 
 //1.4
