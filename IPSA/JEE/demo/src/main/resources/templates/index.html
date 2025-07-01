@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire Bonjour</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f2ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 2rem;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        input[type="text"] {
+            padding: 0.5rem;
+            font-size: 1rem;
+            width: 80%;
+            margin-bottom: 1rem;
+        }
+        input[type="submit"] {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 800px;
+            margin-top: 1rem;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bonjour !</h1>
+        <form action="/traiter-formulaire" method="GET">
+            <input type="text" name="nom" placeholder="Entrez votre nom" required>
+            <br>
+            <input type="submit" value="Envoyer">
+        </form>
+    </div>
+
+    <h2>Liste des étudiants</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Date de naissance</th>
+                <th>Âge</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Display the students list -->
+            <tr th:each="student : ${students}">
+                <td th:text="${student.student_id}"></td>
+                <td th:text="${student.student_name}"></td>
+                <td th:text="${student.student_email}"></td>
+                <td th:text="${student.student_dob}"></td>
+                <td th:text="${student.student_age}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
