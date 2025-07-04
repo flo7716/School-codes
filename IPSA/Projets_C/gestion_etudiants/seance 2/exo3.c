@@ -1,5 +1,5 @@
 #include <stdio.h>
-main()
+int main()
 {     //declaration des variables
     int x,i,a;
     printf("Florian ANDRE, Bachelor 2 DIA");
