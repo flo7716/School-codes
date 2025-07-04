@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <G:\Mon Drive\IPSA\Bachelor 2\semestre 1\C\seance 3\ma_biblio_matrice.h>
+#include "ma_biblio_matrice.h"
 //ANDRE Florian
 //2B DIA
 int mmax,nmax,n,m,s;
