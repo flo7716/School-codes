@@ -5,7 +5,7 @@
 //----------------------------------------------
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 
 
 typedef struct {
@@ -130,20 +130,20 @@ void saisir_n_etudiant_d_f(etudiant * e, int d, int f) {
 int chercher_etudiant(etudiant *e, int n, char nom[], char prenom[]) {
     for (int i = 0; i < n; i++) {
         if (strcmp(e[i].nom, nom) == 0 && strcmp(e[i].prenom, prenom) == 0) {
-            return i; // Retourne l'index de l'étudiant trouvé
+            return i; // Retourne l'index de l'ï¿½tudiant trouvï¿½
         }
     }
-    return -1; // Retourne -1 si l'étudiant n'est pas trouvé
+    return -1; // Retourne -1 si l'ï¿½tudiant n'est pas trouvï¿½
 }
 
 void supprimer_etudiant(etudiant *e, int *n, char nom[], char prenom[]) {
     int index = chercher_etudiant(e, *n, nom, prenom);
     if (index != -1) {
-        // Remplace l'étudiant à supprimer par le dernier étudiant dans le tableau
+        // Remplace l'ï¿½tudiant ï¿½ supprimer par le dernier ï¿½tudiant dans le tableau
         e[index] = e[*n - 1];
-        // Réduit la taille du tableau
+        // Rï¿½duit la taille du tableau
         *n = *n - 1;
-        // Réalloue la mémoire pour le tableau
+        // Rï¿½alloue la mï¿½moire pour le tableau
         e = (etudiant *)realloc(e, (*n) * sizeof(etudiant));
         printf("Etudiant supprime avec succes.\n");
     } else {
