@@ -51,7 +51,10 @@ Liste ajout_liste_queue(Liste L, int val)
         return(P);
     }
     else
-        L->suivant=ajout_liste_queue(L->suivant,val);
+    {
+        L->suivant = ajout_liste_queue(L->suivant, val);
+        return L;
+    }
 }
 
 
@@ -142,7 +145,7 @@ Liste suppression_milieu(Liste L, int val)
 
     if (temp == NULL)
     {
-        printf("La valeur %d n'a pas été trouvée dans la liste.\n", val);
+        printf("La valeur %d n'a pas ï¿½tï¿½ trouvï¿½e dans la liste.\n", val);
         return L;
     }
 
@@ -188,12 +191,12 @@ main()
     printf("\nNombre d'occurences de la valeur recherchee : %d",R);
 
 
-    // Suppression au début
+    // Suppression au dï¿½but
     printf("\nSuppression au debut:\n");
     L = suppression_debut(L);
     afficher_liste(L);
 
-    // Suppression à la fin
+    // Suppression ï¿½ la fin
     printf("\nSuppression a la fin:\n");
     L = suppression_fin(L);
     afficher_liste(L);
