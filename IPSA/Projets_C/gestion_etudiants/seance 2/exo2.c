@@ -17,7 +17,7 @@ main()
     }while(x<=10);
     /*while(x<=10){
 
-        printf("Ressaisissez un entier supérieur a 10 svp: ");
+        printf("Ressaisissez un entier superieur a 10 svp: ");
         scanf("%d",&x);
     }*/
 
