@@ -11,7 +11,7 @@ int annee_bissextile()
         printf("%d n'est pas une annee bissextile",a);
 }*/
 
-main()
+int main()
 { int a,m,j,a_bissextile,date_correcte ;
 
      printf("Saisissez une annee : ");
@@ -62,4 +62,6 @@ main()
         printf("\nDate correcte : %d/%d/%d",j,m,a);
     else
         printf("\nDate incorrecte : %d/%d/%d",j,m,a);
+
+    return 0;
 }
