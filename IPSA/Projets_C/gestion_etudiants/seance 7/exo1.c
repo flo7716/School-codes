@@ -9,7 +9,7 @@
 #include"biblioetudiantpointeurtp7.h"
 
 
-main()
+int main()
 {
     exo_etudiant();
 }
