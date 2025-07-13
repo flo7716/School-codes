@@ -6,7 +6,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-main()
+int main()
 {
     int *x;
     x=(int*)malloc(2*sizeof(int));
@@ -22,4 +22,5 @@ main()
     printf("\nv2 = %d", *(x+1));
     printf("\nA1 = %d",x);
     printf("\nA2 = %d",x+1);
+    exit(0);
 }
