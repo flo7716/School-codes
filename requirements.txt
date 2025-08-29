@@ -6,3 +6,7 @@ scikit-learn
 statsmodels
 weaviate-client
 tensorflow
+fastapi
+uvicorn
+pydantic
+sqlite3
