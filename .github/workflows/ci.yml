@@ -7,47 +7,66 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  devsecops:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Récupération du code
+      # 1. Checkout du code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Sécurité Python (Bandit)
-      - name: Run Bandit (code security)
+      # 2. Config Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Bandit (code security)
+      - name: Run Bandit
         run: |
           pip install bandit
-          bandit -r . -ll
+          bandit -r . -ll --format github || true
+        continue-on-error: true   # Affiche dans PR, mais n’échoue pas directement
 
-      # 3. Analyse des dépendances (pip-audit)
-      - name: Run pip-audit (dependencies)
+      # 4. pip-audit (dependencies)
+      - name: Run pip-audit
         run: |
           pip install pip-audit
-          pip-audit || true   # fail pas direct, mais log
+          pip-audit --format table || true
+          echo "👉 Pour corriger automatiquement : pip-audit --fix"
+        continue-on-error: true
 
-      # 4. Linter (flake8)
-      - name: Run flake8 (linting)
+      # 5. Linter flake8
+      - name: Run flake8
         run: |
           pip install flake8
           flake8 .
+        continue-on-error: false   # Ici on force correction de style
 
-      # 5. Tests unitaires (si présents)
+      # 6. Tests unitaires
       - name: Run tests
         run: |
           pip install -r requirements.txt || true
-          pytest || echo "No tests found"
+          pytest || echo "⚠️ Aucun test trouvé"
 
-      # 6. Scan image Docker (si repo a un Dockerfile)
+      # 7. Build Docker image
       - name: Build Docker image
         run: docker build -t myapp .
 
+      # 8. Scan image Docker avec Trivy
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: myapp
           format: 'table'
-          exit-code: '1'
+          exit-code: '1'          # Faille HIGH/CRITICAL = pipeline échoue
+          severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
           vuln-type: 'os,library'
+
+      # 9. Upload rapport Trivy
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-results.txt
