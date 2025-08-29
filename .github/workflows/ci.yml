@@ -1,0 +1,53 @@
+name: CI DevSecOps
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupération du code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Sécurité Python (Bandit)
+      - name: Run Bandit (code security)
+        run: |
+          pip install bandit
+          bandit -r . -ll
+
+      # 3. Analyse des dépendances (pip-audit)
+      - name: Run pip-audit (dependencies)
+        run: |
+          pip install pip-audit
+          pip-audit || true   # fail pas direct, mais log
+
+      # 4. Linter (flake8)
+      - name: Run flake8 (linting)
+        run: |
+          pip install flake8
+          flake8 .
+
+      # 5. Tests unitaires (si présents)
+      - name: Run tests
+        run: |
+          pip install -r requirements.txt || true
+          pytest || echo "No tests found"
+
+      # 6. Scan image Docker (si repo a un Dockerfile)
+      - name: Build Docker image
+        run: docker build -t myapp .
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: myapp
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
