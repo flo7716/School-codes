@@ -65,3 +65,13 @@ def delete_entity(entity: str, entity_id: int):
         return {"message": f"{entity.capitalize()} deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+
+## main
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="localhost", port=8000)
+
+
