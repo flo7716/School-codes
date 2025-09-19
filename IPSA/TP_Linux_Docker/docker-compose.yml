@@ -8,6 +8,6 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - /home/florian/Documents/tp_linux:/bin223
+      - /home/florianandre/Documents/tp_linux:/bin223
     command: bash
 
