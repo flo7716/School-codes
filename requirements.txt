@@ -9,4 +9,3 @@ tensorflow
 fastapi
 uvicorn
 pydantic
-sqlite3
