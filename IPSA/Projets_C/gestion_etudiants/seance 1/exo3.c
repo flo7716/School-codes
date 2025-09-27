@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-main()
+int main()
 {
     int x;
     printf("donner un entier svp: ");
@@ -13,5 +13,6 @@ main()
     {
         printf("%d est impair",x);
     }
+    return 0;
 }
 

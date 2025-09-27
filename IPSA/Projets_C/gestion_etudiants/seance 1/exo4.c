@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <complex.h>
-main()
+int main()
 {
     //Declaration des variables
     float a,b,c;
@@ -41,4 +41,5 @@ main()
             printf("2 racines complexes conjuguees z1= %f - %fi et z2= %f + %fi",x1,x2);
         }
     }
+    return 0;
 }
