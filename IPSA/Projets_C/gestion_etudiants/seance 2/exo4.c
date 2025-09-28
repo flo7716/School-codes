@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-main()
+int main()
 
 {   //-------------------------------
     // Declaration des variables
@@ -36,5 +36,6 @@ main()
        printf(" %d ",t1[i]);
 
     }
+return 0;
 
 }
