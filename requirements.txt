@@ -9,3 +9,6 @@ tensorflow
 fastapi
 uvicorn
 pydantic
+sqlite3
+authlib>=1.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
+keras>=3.11.3 # not directly required, pinned by Snyk to avoid a vulnerability
