@@ -127,9 +127,10 @@ void afficher_1_etudiant(Etudiant e) {
     system("PAUSE");
 }
 
-main()
+int main()
 {
     Etudiant e;
     e=saisir_1_etudiant();
     afficher_1_etudiant(e);
+    return 0;
 }
