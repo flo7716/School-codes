@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <complex.h>
-main()
+int main()
 {
     //Declaration des variables
 
@@ -13,15 +13,15 @@ main()
         printf("\n  Exercice 1 : Equation du 2nd degre " );
         printf("\n---------------------------------------------");
     //Mon programme
-    printf("a :");
+    printf("\na :");
     scanf("%f",&a);
-    printf("b :");
+    printf("\nb :");
     scanf("%f",&b);
-    printf("c :");
+    printf("\nc :");
     scanf("%f",&c);
     if(a==0)
     {
-        printf("Votre equation n'est pas de degre 2");
+        printf("\nVotre equation n'est pas de degre 2");
     }
     else
     {
@@ -29,19 +29,20 @@ main()
         if(delta==0)
         {
             x1=-b/(2*a);
-            printf("1 seule racine x1=%f",x1);
+            printf("\n1 seule racine x1=%f",x1);
         }
         if(delta>0)
         {
             x1=(-b-sqrt(delta))/(2*a);
             x2=(-b+sqrt(delta))/(2*a);
-            printf("2 racines reelles x1= %f et x2= %f",x1,x2);
+            printf("\n2 racines reelles x1= %f et x2= %f",x1,x2);
         }
         if(delta<0)
         {
             x1=b/(2*a); //partie reelle
             x2=sqrt(-delta)/(2*a); //partie imaginaire pure
-            printf("2 racines complexes conjuguees z1= %f - %fi et z2= %f + %fi",x1,x2);
+            printf("\n2 racines complexes conjuguees z1= %f - %fi et z2= %f + %fi",x1,x2);
         }
     }
+    return 0;
 }

@@ -34,4 +34,5 @@ int main()
     }while(a!=0);
 system("CLS");
 printf("\n Merci et au revoir " );
+return 0;
 }

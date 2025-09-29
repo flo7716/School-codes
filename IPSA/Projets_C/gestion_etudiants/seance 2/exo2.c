@@ -1,5 +1,5 @@
 #include <stdio.h>
-main()
+int main()
 {
     int x;
     printf("Florian ANDRE, Bachelor 2 DIA");
@@ -22,4 +22,5 @@ main()
     }*/
 
     printf(" Ouf c est bon !!! ");
+    return 0;
 }
