@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 //ANDRE Florian
 //2B DIA
 
@@ -9,9 +10,11 @@ main(){
     char identite[30];
     int R;
     printf("Saisissez votre nom : ");
-    gets(nom);
+    fgets(nom, sizeof(nom), stdin);
+    nom[strcspn(nom, "\n")] = '\0';  // Remove newline
     printf("Saisissez votre prenom : ");
-    gets(prenom);
+    fgets(prenom, sizeof(prenom), stdin);
+    prenom[strcspn(prenom, "\n")] = '\0';  // Remove newline
     strcpy(identite,"");
     strcat(identite,nom);
     strcat(identite,"");
