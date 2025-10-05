@@ -19,7 +19,8 @@ int main(){
     strcat(identite,nom);
     strcat(identite,"");
     strcat(identite,prenom);
-    system("CLS");
+    //CLEAR SCREEN
+    printf("\033[H\033[J");
     printf("\n Nom : %s",nom);
     printf("\n Prenom : %s",prenom);
     printf("\n La taille de votre identite est %d",strlen(identite));
