@@ -75,7 +75,7 @@ etudiant saisir_1_etudiant() {
 }
 
 void afficher_1_etudiant(etudiant e, int i) {
-    system("CLS");
+    printf("\033[H\033[J");
     printf("\n-------------------------");
     printf("\n--------ETUDIANT %d---------", i + 1);
     printf("\n-------------------------");
@@ -98,12 +98,12 @@ void saisir_n_etudiant(etudiant * e, int n) {
     int i;
 
     for (i = 0; i < n; i++) {
-        system("CLS");
+        printf("\033[H\033[J");
         printf("\n------------------------------");
         printf("\n--------ETUDIANT %d---------", i + 1);
         printf("\n------------------------------");
         *(e+i) = saisir_1_etudiant();
-        system("CLS");
+        printf("\033[H\033[J");
     }
 }
 
@@ -118,12 +118,12 @@ void saisir_n_etudiant_d_f(etudiant * e, int d, int f) {
     int i;
 
     for (i = d; i < f; i++) {
-        system("CLS");
+        printf("\033[H\033[J");
         printf("\n------------------------------");
         printf("\n--------ETUDIANT %d---------", i + 1);
         printf("\n------------------------------");
         *(e+i) = saisir_1_etudiant();
-        system("CLS");
+        printf("\033[H\033[J");
     }
 }
 
@@ -159,7 +159,7 @@ void exo_etudiant() {
     e = NULL;
     N = 0;
     do {
-        system("CLS");
+        printf("\033[H\033[J");
         printf("\n------------------------------------------------------");
         printf("\n----------------------- MENU -------------------------");
         printf("\n------------------------------------------------------");
@@ -182,16 +182,16 @@ void exo_etudiant() {
             N = n + N;
         } else if (x == 2) {
             if (e == NULL) {
-                system("CLS");
+                printf("\033[H\033[J");
                 printf("Vous n'avez pas encore d'etudiant\n");
                 system("PAUSE");
             } else {
                 afficher_n_etudiant(e, N);
-                system("CLS");
+                printf("\033[H\033[J");
             }
         } else if (x == 3) {
             if (e == NULL) {
-                system("CLS");
+                printf("\033[H\033[J");
                 printf("Vous n'avez pas encore d'etudiant\n");
                 system("PAUSE");
             } else {
@@ -211,7 +211,7 @@ void exo_etudiant() {
             }
         } else if (x == 4) {
             if (e == NULL) {
-                system("CLS");
+                printf("\033[H\033[J");
                 printf("Vous n'avez pas encore d'etudiant\n");
                 system("PAUSE");
             } else {
@@ -227,7 +227,7 @@ void exo_etudiant() {
     } while (x != 5);
     if (x == 5) {
         free(e);
-        system("CLS");
+        printf("\033[H\033[J");
         printf("Bonne journee\n");
     }
 }

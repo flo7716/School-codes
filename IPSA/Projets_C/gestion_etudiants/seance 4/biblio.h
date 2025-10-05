@@ -75,7 +75,7 @@ etudiant saisir_1_etudiant() {
 }
 
 void afficher_1_etudiant(etudiant e, int i) {
-    system("CLS");
+    printf("\033[H\033[J");
     printf("\n-------------------------");
     printf("\n--------ETUDIANT %d---------", i + 1);
     printf("\n-------------------------");
@@ -98,12 +98,12 @@ void saisir_n_etudiant(etudiant e[nmax], int n) {
     int i;
 
     for (i = 0; i < n; i++) {
-        system("CLS");
+        printf("\033[H\033[J");
         printf("\n------------------------------");
         printf("\n--------ETUDIANT %d---------", i + 1);
         printf("\n------------------------------");
         e[i] = saisir_1_etudiant();
-        system("CLS");
+        printf("\033[H\033[J");
     }
 }
 
