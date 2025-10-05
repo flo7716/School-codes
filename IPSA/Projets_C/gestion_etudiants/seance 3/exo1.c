@@ -3,7 +3,7 @@
 //ANDRE Florian
 //2B DIA
 
-main(){
+int main(){
     int longueur;
     char nom[15];
     char prenom[15];
@@ -33,4 +33,5 @@ main(){
         printf("\n R = %d",R);
         printf("\n non ce n'est pas toi casse-toi de la! \n");
         }
+    return 0;
 }
