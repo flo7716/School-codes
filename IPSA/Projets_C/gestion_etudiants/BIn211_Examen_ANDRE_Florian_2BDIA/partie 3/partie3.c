@@ -156,11 +156,12 @@ void Afficher_n_etudiants(Etudiant e[nmax], int n) {
     }
 }
 
-main()
+int main()
 {
     int n;
     Etudiant e[nmax];
     n = Saisir_Nbre_etudiant();
     Saisir_n_etudiants(e, n);
     Afficher_n_etudiants(e, n);
+    return 0;
 }

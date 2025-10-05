@@ -156,7 +156,7 @@ void Afficher_n_etudiants(Etudiant *e, int n) {
     }
 }
 
-main()
+int main()
 {
     int n;
     Etudiant *e;
@@ -164,4 +164,5 @@ main()
     e= (Etudiant*) malloc ( n *sizeof (Etudiant));
     Saisir_n_etudiants(e, n);
     Afficher_n_etudiants(e, n);
+    return 0;
 }

@@ -171,7 +171,7 @@ void Saisir_n_etudiant_d_f(Etudiant * e, int d, int f) {
 
 
 
-main()
+int main()
 {
     int n, x;
     Etudiant *e;
@@ -214,5 +214,6 @@ main()
         system("CLS");
         printf("Bonne journee\n");
     }
+    return 0;
 }
 
