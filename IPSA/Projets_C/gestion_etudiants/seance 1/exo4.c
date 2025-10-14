@@ -10,11 +10,11 @@ int main()
     printf("Exercice 4\n");
     printf("-----------------------\n");
     //Mon programme
-    printf("a :");
+    printf("a : ");
     scanf("%f",&a);
-    printf("b :");
+    printf("b : ");
     scanf("%f",&b);
-    printf("c :");
+    printf("c : ");
     scanf("%f",&c);
     if(a==0)
     {
@@ -38,7 +38,7 @@ int main()
         {
             x1=b/(2*a); //partie reelle
             x2=sqrt(-delta)/(2*a); //partie imaginaire pure
-            printf("2 racines complexes conjuguees z1= %f - %fi et z2= %f + %fi",x1,x2);
+            printf("2 racines complexes conjuguees z1= %f - %fi et z2= %f + %fi \n",x1,x2);
         }
     }
     return 0;
