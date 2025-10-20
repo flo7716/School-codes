@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Installs Jenkins on Ubuntu 24.04 LTS
+# Installs Jenkins on Ubuntu 24.04 LTS or any Debian-based distribution system
 
 # Install Java (OpenJDK 21)
 sudo apt update
