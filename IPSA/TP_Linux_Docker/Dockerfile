@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 # Mise à jour des paquets
 RUN apt update && apt upgrade -y
