@@ -8,6 +8,6 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - :/bin223
+      - .:/bin223
     command: bash
 
