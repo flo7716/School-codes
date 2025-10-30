@@ -8,6 +8,6 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - /home/florianandre/Documents/School-codes/IPSA/TP_Linux_Docker:/bin223
+      - :/bin223
     command: bash
 
