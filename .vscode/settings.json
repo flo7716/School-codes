@@ -18,14 +18,14 @@
                 "authProtocol": "default",
                 "enableSsl": "Disabled"
             },
+            "ssh": "Disabled",
             "previewLimit": 50,
             "server": "localhost",
             "port": 3306,
-            "driver": "MySQL",
-            "name": "localhost",
-            "username": "root",
-            "database": "parc_info",
-            "askForPassword": true
+            "driver": "MariaDB",
+            "name": "VS_CODE",
+            "database": "parc_informatique",
+            "username": "root"
         }
     ],
     "java.compile.nullAnalysis.mode": "automatic",
