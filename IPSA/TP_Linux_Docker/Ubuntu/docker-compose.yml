@@ -9,5 +9,7 @@ services:
     stdin_open: true
     volumes:
       - .:/bin223
+    ports:
+      - "2222:22"
     command: bash
 

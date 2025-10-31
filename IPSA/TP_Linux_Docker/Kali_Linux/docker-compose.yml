@@ -7,6 +7,9 @@ services:
       dockerfile: Dockerfile
     tty: true
     stdin_open: true
+    #Ouvert le port 2222 de la machine hôte vers le port 22 du conteneur
+    ports:
+      - "2222:22"
     volumes:
       - .:/bin223
     command: bash

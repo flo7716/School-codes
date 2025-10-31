@@ -8,7 +8,7 @@ RUN dnf update -y
 RUN dnf install -y python3 iproute iputils nano htop net-tools curl wget git
 
 # Définition de variables d'environnement
-ENV TERM xterm-color
+ENV TERM=xterm-color
 
 CMD ["bash"]
 
