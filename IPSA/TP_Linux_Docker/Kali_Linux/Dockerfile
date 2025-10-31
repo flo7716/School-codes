@@ -1,40 +1,13 @@
-## Dockerfile for Kali Linux with essential pentest and forensic tools
-
-# Use the official Kali Linux base image
+# Dockerfile for Kali Linux with essential pentest and forensic tools
 FROM kalilinux/kali-rolling
 
-# Update and upgrade the system
-RUN apt-get update && apt-get -y upgrade
 
-# Install essential pentest and forensic tools
-RUN apt-get install -y \
-    nmap \
-    wireshark \
-    john \
-    hydra \
-    sqlmap \
-    metasploit-framework \
-    aircrack-ng \
-    binwalk \
-    volatility \
-    autopsy \
-    sleuthkit \
-    gdb \
-    strace \
-    ltrace \
-    tcpdump \
-    netcat \
-    nikto \
-    dirb \
-    burpsuite \
-    zaproxy \
-    hashcat \
-    steghide \
-    foremost \
-    exiftool \
-    hexedit \
-    && apt-get clean
+# Install essential packages in one layer, clean up afterwards to reduce image size
+RUN apt-get update
+RUN apt-get install -y ca-certificates apt-transport-https gnupg wget curl nano
 
-# Set the default command to bash
+# pentest & forensic tools
+RUN apt-get install -y nmap wireshark john hydra sqlmap metasploit-framework aircrack-ng binwalk autopsy sleuthkit gdb strace ltrace tcpdump nikto dirb burpsuite zaproxy hashcat steghide foremost exiftool hexedit
+
+# Set default command to bash
 CMD ["/bin/bash"]
-# End of Dockerfile 
