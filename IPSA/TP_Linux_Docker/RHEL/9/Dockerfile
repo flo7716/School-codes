@@ -3,8 +3,9 @@ FROM registry.access.redhat.com/ubi9/ubi:latest
 #installation des paquets nécessaires
 RUN dnf update -y && dnf install -y sudo python3 iproute iputils nano net-tools git
 
-#ajout user non-root
+#ajout user non-root (+ passwd)
 RUN useradd -m -u 1001 appuser
+RUN echo "appuser:${password}" | chpasswd
 
 #définition du répertoire de travail
 WORKDIR /home/appuser
