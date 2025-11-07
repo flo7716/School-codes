@@ -1,5 +1,8 @@
 FROM registry.access.redhat.com/ubi9/ubi:latest
 
+#installation des paquets nécessaires
+RUN dnf update -y && dnf install -y sudo python3 iproute iputils nano htop net-tools curl wget git
+
 #ajout user non-root
 RUN useradd -m -u 1001 appuser
 
@@ -17,8 +20,6 @@ USER 1001
 #exposition du port
 EXPOSE 8080
 
-#installation des paquets nécessaires
-RUN sudo dnf update -y && sudo dnf install -y python3 iproute iputils nano htop net-tools curl wget git
 
 #commande de démarrage de l'application
 # Définition de variables d'environnement
