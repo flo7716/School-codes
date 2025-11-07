@@ -7,8 +7,6 @@ RUN useradd -m -u 1001 appuser
 WORKDIR /home/appuser
 USER appuser
 
-#copie de l'application
-COPY app/ /home/appuser/app
 
 #configuration des droits
 RUN chown -R appuser:appuser /home/appuser
@@ -18,6 +16,9 @@ USER 1001
 
 #exposition du port
 EXPOSE 8080
+
+#installation des paquets nécessaires
+RUN sudo dnf update -y && sudo dnf install -y python3 iproute iputils nano htop net-tools curl wget git
 
 #commande de démarrage de l'application
 # Définition de variables d'environnement
