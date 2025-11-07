@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi9/ubi:latest
 
 #installation des paquets nécessaires
-RUN dnf update -y && dnf install -y sudo python3 iproute iputils nano htop net-tools curl wget git
+RUN dnf update -y && dnf install -y sudo python3 iproute iputils nano net-tools curl wget git
 
 #ajout user non-root
 RUN useradd -m -u 1001 appuser
