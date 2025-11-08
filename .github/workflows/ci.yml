@@ -43,9 +43,14 @@ jobs:
           pip install -r requirements.txt || true
           pytest || echo "⚠️ Aucun test trouvé"
 
-      # 6. Build Docker image
-      - name: Build Docker image
-        run: docker build -t myapp .
+      # 6. Build all Docker images on this repo
+      - name: Build Docker images
+        run: |
+          for dir in */ ; do
+            if [ -f "$dir/Dockerfile" ]; then
+              docker build -t "${{ github.repository }}:${{ github.sha }}" "$dir"
+            fi
+          done
 
       # 7. Scan image Docker avec Trivy
       - name: Scan Docker image with Trivy
