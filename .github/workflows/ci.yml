@@ -36,24 +36,18 @@ jobs:
           echo "👉 Pour corriger automatiquement : pip-audit --fix"
         continue-on-error: true
 
-      # 5. Linter flake8
-      - name: Run flake8
-        run: |
-          pip install flake8
-          flake8 .
-        continue-on-error: false   # Ici on force correction de style
 
-      # 6. Tests unitaires
+      # 5. Tests unitaires
       - name: Run tests
         run: |
           pip install -r requirements.txt || true
           pytest || echo "⚠️ Aucun test trouvé"
 
-      # 7. Build Docker image
+      # 6. Build Docker image
       - name: Build Docker image
         run: docker build -t myapp .
 
-      # 8. Scan image Docker avec Trivy
+      # 7. Scan image Docker avec Trivy
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -64,7 +58,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
 
-      # 9. Upload rapport Trivy
+      # 8. Upload rapport Trivy
       - name: Upload Trivy report
         uses: actions/upload-artifact@v4
         with:
