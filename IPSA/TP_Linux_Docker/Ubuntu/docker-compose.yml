@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  in322:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/bin223
+    ports:
+      - "2222:22"
+    command: bash
+
