@@ -1,15 +1,18 @@
 - name: Créer des utilisateurs
   hosts: localhost
   become: true
+  vars:
+    users:
+      - name: user1
+        password: "{{ lookup('env', 'password_user1') | password_hash('sha512') }}"
+      - name: user2
+        password: "{{ lookup('env', 'password_user2') | password_hash('sha512') }}"
+      - name: user3
+        password: "{{ lookup('env', 'password_user3') | password_hash('sha512') }}"
   tasks:
-    - name: Ajouter plusieurs utilisateurs (avec une boucle et des credentials associes)
+    - name: Ajouter plusieurs utilisateurs
       ansible.builtin.user:
         name: "{{ item.name }}"
-        state: present
         password: "{{ item.password }}"
-      loop:
-        - user1: "{{ lookup('env', 'password_user1') }}"
-        - user2: "{{ lookup('env', 'password_user2') }}"
-        - user3: "{{ lookup('env', 'password_user3') }}"
-
-
+        state: present
+      loop: "{{ users }}"
