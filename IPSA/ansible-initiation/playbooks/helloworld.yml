@@ -1,0 +1,13 @@
+##Ansible Playbook to print hello world
+- name: Print Hello World
+  hosts: localhost
+  tasks:
+    - name: Display Hello World message
+      debug:
+        msg: "Hello, World!"  
+    
+    - name: Print current date and time
+      command: date
+      register: current_date
+
+

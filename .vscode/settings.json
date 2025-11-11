@@ -32,5 +32,6 @@
     "java.configuration.updateBuildConfiguration": "interactive",
     "python-envs.defaultEnvManager": "ms-python.python:conda",
     "python-envs.defaultPackageManager": "ms-python.python:conda",
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "ansible.python.interpreterPath": "/home/florianandre/anaconda3/envs/School-codes/bin/python"
 }
