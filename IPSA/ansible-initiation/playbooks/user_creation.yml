@@ -2,11 +2,14 @@
   hosts: localhost
   become: true
   tasks:
-    - name: Ajouter plusieurs utilisateurs
+    - name: Ajouter plusieurs utilisateurs (avec une boucle et des credentials associes)
       ansible.builtin.user:
-        name: "{{ item }}"
+        name: "{{ item.name }}"
         state: present
+        password: "{{ item.password }}"
       loop:
-        - user1
-        - user2
-        - user3
+        - user1: "{{ lookup('env', 'password_user1') }}"
+        - user2: "{{ lookup('env', 'password_user2') }}"
+        - user3: "{{ lookup('env', 'password_user3') }}"
+
+
