@@ -1,0 +1,15 @@
+## script to remove users from the system
+- name: Supprimer des utilisateurs
+  hosts: localhost
+  become: true
+  vars:
+    users:
+      - name: user1
+      - name: user2
+      - name: user3
+  tasks:
+    - name: Supprimer plusieurs utilisateurs
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ users }}"
