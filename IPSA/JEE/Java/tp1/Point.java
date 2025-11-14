@@ -81,6 +81,7 @@ public class Point{
 
 
         String ch3 = "Anticonstitutionnellement";
+	System.out.println(ch3);
         char tab[] = {'a', 'e', 'i', 'o', 'u', 'y', 'A', 'E', 'I', 'O', 'U', 'Y'};
         for(char elem : tab){
             int cpt = 0;
