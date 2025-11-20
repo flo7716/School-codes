@@ -5,8 +5,4 @@ winget install vagrant
 #téléchargement de virtualbox
 winget install virtualbox
 
-#vérification des installations
-vagrant --version
-VBoxManage --version
-
 #fin du script
