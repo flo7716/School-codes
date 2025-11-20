@@ -1,9 +1,9 @@
 #installation de vagrant et virtualbox sur Windows 11
 #téléchargement de vagrant
-winget.exe install --id HashiCorp.Vagrant -e
+winget install vagrant
 
 #téléchargement de virtualbox
-winget.exe install --id Oracle.VirtualBox -e
+winget install virtualbox
 
 #vérification des installations
 vagrant --version
