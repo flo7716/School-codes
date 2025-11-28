@@ -1,0 +1,33 @@
+---
+- name: Add a new Vagrant node (node3)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vagrantfile_path: "{{ playbook_dir | dirname | dirname }}/kubernetes/vagrantfile"
+    node_name: "node3"
+  tasks:
+    - name: Ensure node3 config is present in vagrantfile
+      lineinfile:
+        path: "{{ vagrantfile_path }}"
+        insertafter: "node2"
+        line: |
+          # Node3 config added by Ansible
+          Vagrant.configure("2") do |config|
+            config.vm.define "node3" do |node3|
+              node3.vm.box = "debian/bookworm64"
+              node3.vm.hostname = "node3"
+              node3.vm.network "private_network", ip: "192.168.56.13"
+              node3.vm.provider "virtualbox" do |vb|
+                vb.memory = 1024
+                vb.cpus = 1
+              end
+            end
+          end
+      notify:
+        - Run vagrant up node3
+
+  handlers:
+    - name: Run vagrant up node3
+      command: vagrant up node3
+      args:
+        chdir: "{{ vagrantfile_path | dirname }}"
