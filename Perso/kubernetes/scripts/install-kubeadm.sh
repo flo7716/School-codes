@@ -36,7 +36,7 @@ apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
 echo "Kubernetes components installed successfully."
-kubectl version --client --short
+kubectl version --client
 
 # ------------------------------
 # Initialize Kubernetes cluster
