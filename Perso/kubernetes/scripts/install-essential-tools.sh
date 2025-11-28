@@ -14,6 +14,8 @@ apt-get install -y \
     vim \
     net-tools \
     wget \
-    sysctl \
     git
+
+#installation des dependances pour sysctl
+apt-get install -y procps
 echo "Essential tools have been installed successfully."
