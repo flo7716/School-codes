@@ -20,5 +20,5 @@ apt-get install -y \
 apt-get install -y procps
 
 #installation des dependances pour le reseau (bridge-utils et iptables)
-apt-get install -y bridge-utils iptables-nft
+apt-get install -y bridge-utils iptables
 echo "Essential tools have been installed successfully."
