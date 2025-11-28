@@ -14,5 +14,6 @@ apt-get install -y \
     vim \
     net-tools \
     wget \
+    sysctl \
     git
 echo "Essential tools have been installed successfully."
