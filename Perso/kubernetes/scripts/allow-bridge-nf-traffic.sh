@@ -18,7 +18,7 @@ if ! lsmod | grep -q bridge; then
     echo "bridge module loaded."
 else
     echo "bridge module is already loaded."
-
+fi
 
 # Enable bridge-nf-call-iptables
 sysctl -w net.bridge.bridge-nf-call-iptables=1
