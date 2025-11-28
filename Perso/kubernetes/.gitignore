@@ -10,5 +10,6 @@
 *.orig
 *.rej
 
-Perso/kubernetes/.vagrant/*
-Perso/kubernetes/.kubernetes/*
+# ignore vagrant and kubernetes runtime directories
+/.vagrant/
+/.kubernetes/
