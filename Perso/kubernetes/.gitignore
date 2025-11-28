@@ -1,0 +1,11 @@
+#ignore generated files when vagranting up kubernetes
+*.log
+*.out
+*.pid
+*.sock
+*.tmp
+*.bak
+*.swp
+*.old
+*.orig
+*.rej
