@@ -13,3 +13,5 @@ sqlite3
 authlib>=1.6.4 # not directly required, pinned by Snyk to avoid a vulnerability
 keras>=3.11.3 # not directly required, pinned by Snyk to avoid a vulnerability
 starlette>=0.49.1 # not directly required, pinned by Snyk to avoid a vulnerability
+fonttools>=4.61.0 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=2.6.0 # not directly required, pinned by Snyk to avoid a vulnerability
