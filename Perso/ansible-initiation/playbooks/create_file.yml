@@ -4,5 +4,5 @@
     - name: Créer un fichier texte
       ansible.builtin.file:
         path: /tmp/ansible_test.txt
-        state: touch
+        state: echo "Fichier créé par Ansible."
         mode: '0644'
