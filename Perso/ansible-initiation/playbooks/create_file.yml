@@ -6,3 +6,21 @@
         path: /tmp/ansible_test.txt
         state: touch
         mode: '0644'
+    
+    - name: Vérifier que le fichier a été créé
+      ansible.builtin.stat:
+        path: /tmp/ansible_test.txt
+      register: file_stat
+
+    - name: Afficher les détails du fichier
+      debug:
+        var: file_stat.stat
+    
+    - name: Écrire du contenu dans le fichier
+      ansible.builtin.copy:
+        content: "Ceci est un fichier créé par Ansible.\n"
+        dest: /tmp/ansible_test.txt
+        mode: '0644'  
+        append: yes
+
+
