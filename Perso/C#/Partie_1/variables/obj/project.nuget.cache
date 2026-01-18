@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "osmZXjXQm6s=",
+  "success": true,
+  "projectFilePath": "/home/florian/Documents/School-codes/Perso/C#/Partie_1/variables/variables.csproj",
+  "expectedPackageFiles": [
+    "/home/florian/.nuget/packages/microsoft.netcore.app.ref/8.0.22/microsoft.netcore.app.ref.8.0.22.nupkg.sha512",
+    "/home/florian/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.22/microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512",
+    "/home/florian/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.22/microsoft.netcore.app.host.linux-x64.8.0.22.nupkg.sha512"
+  ],
+  "logs": []
+}
