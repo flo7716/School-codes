@@ -14,13 +14,6 @@ ADD nbSalle TINYINT(2) DEFAULT 0;
 ALTER TABLE SEGMENT
 ADD nbPoste TINYINT(2) DEFAULT 0;
 
--- Ajouter la colonne nbInstall à la table Logiciel
-ALTER TABLE LOGICIEL
-ADD nbInstall TINYINT(2) DEFAULT 0;
-
--- Ajouter la colonne nbLog à la table Poste
-ALTER TABLE POSTE
-ADD nbLog TINYINT(2) DEFAULT 0;
 
 -- Augmenter la taille de la colonne nomSalle dans la table Salle
 ALTER TABLE SALLE
