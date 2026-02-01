@@ -111,7 +111,7 @@ WHERE i.nLog = (
         SELECT nLog, COUNT(*) AS Nombre_Installations
         FROM INSTALLER
         GROUP BY nLog
-        ORDER BY COUNT(Nombre_Installations) DESC
+        LIMIT 1
     ) AS subquery
 );
 
