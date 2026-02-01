@@ -1,6 +1,6 @@
 SELECT typePoste FROM POSTE WHERE nPoste = 'p8';
 SELECT nomLog FROM LOGICIEL WHERE typeLog = 'UNIX';
-SELECT nomSalle, CONCAT(Salle.indIP,'.',ad), Salle.nSalle FROM SALLE, POSTE WHERE Salle.nSalle = Poste.nSalle AND (typePoste = 'UNIX' OR typePoste = 'PCWS'); 
+SELECT nomSalle, CONCAT(POSTE.indIP,'.',ad), SALLE.nSalle FROM SALLE, POSTE WHERE SALLE.nSalle = POSTE.nSalle AND (typePoste = 'UNIX' OR typePoste = 'PCWS'); 
 SELECT nLog FROM INSTALLER WHERE nPoste = 'p6';
 SELECT nPoste FROM INSTALLER WHERE nLog = 'log1';
 SELECT nomPoste, CONCAT(indIP,'.',ad) FROM POSTE WHERE typePoste = 'TX';
