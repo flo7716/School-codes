@@ -1,11 +1,3 @@
--- Ajouter la colonne nbSalle à la table Segment
-ALTER TABLE SEGMENT
-ADD nbSalle TINYINT(2) DEFAULT 0;
-
--- Ajouter la colonne nbPoste à la table Segment
-ALTER TABLE SEGMENT
-ADD nbPoste TINYINT(2) DEFAULT 0;
-
 -- Ajouter la colonne nbInstall à la table Logiciel
 ALTER TABLE LOGICIEL
 ADD nbInstall TINYINT(2) DEFAULT 0;
