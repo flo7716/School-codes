@@ -26,6 +26,21 @@
             "name": "VS_CODE",
             "database": "parc_informatique",
             "username": "root"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "florian",
+            "username": "root",
+            "database": "parc_informatique",
+            "askForPassword": true
         }
     ],
     "java.compile.nullAnalysis.mode": "automatic",
