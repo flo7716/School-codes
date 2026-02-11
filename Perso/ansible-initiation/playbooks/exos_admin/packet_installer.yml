@@ -1,0 +1,41 @@
+- name: Installer un paquet
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Installer curl
+      ansible.builtin.apt:
+        name: curl
+        state: present
+        update_cache: yes
+    
+    - name: Installer git
+      ansible.builtin.apt:
+        name: git
+        state: present
+        update_cache: yes
+    
+    - name: Installer vim
+      ansible.builtin.apt:
+        name: vim
+        state: present
+        update_cache: yes
+    
+    - name: Installer htop
+      ansible.builtin.apt:
+        name: htop
+        state: present
+        update_cache: yes
+    
+    - name: Installer net-tools
+      ansible.builtin.apt:
+        name: net-tools
+        state: present
+        update_cache: yes 
+    
+    - name: Installer ufw
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+        update_cache: yes
+    
+    
