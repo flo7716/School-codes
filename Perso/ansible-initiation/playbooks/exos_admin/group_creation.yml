@@ -2,7 +2,7 @@
   hosts: localhost
   become: true
   vars:
-    groups:
+    system_groups:
       - name: group1
       - name: group2
       - name: group3
@@ -11,4 +11,4 @@
       ansible.builtin.group:
         name: "{{ item.name }}"
         state: present
-      loop: "{{ groups }}"
+      loop: "{{ system_groups }}"
