@@ -5,7 +5,7 @@ FROM fedora:latest
 RUN dnf update -y
 
 # Installation de paquets
-RUN dnf install -y python3 iproute iputils nano htop net-tools curl wget git
+RUN dnf install -y python3 iproute iputils nano htop net-tools curl wget git python3-passlib
 
 # Installation d'Ansible
 RUN dnf install -y ansible ansible-playbook ansible-galaxy
