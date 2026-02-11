@@ -1,0 +1,24 @@
+- name: activation ufw
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Autoriser le port 22 en sortie
+      ansible.builtin.command: ufw allow out 22/tcp
+      args:
+        warn: false
+    - name: Autoriser le port 80 en sortie
+      ansible.builtin.command: ufw allow out 80/tcp
+      args:
+        warn: false
+    - name: Autoriser le port 443 en sortie
+      ansible.builtin.command: ufw allow out 443/tcp
+      args:
+        warn: false
+    - name: Autoriser l'acces via Docker
+      ansible.builtin.command: ufw allow in on docker0
+      args:
+        warn: false 
+    - name: Activer ufw
+      ansible.builtin.command: ufw enable
+      args:
+        warn: false
