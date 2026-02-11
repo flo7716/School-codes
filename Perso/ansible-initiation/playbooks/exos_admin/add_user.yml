@@ -1,0 +1,35 @@
+- name: create user with bash shell
+  hosts: localhost
+  become: true
+  vars:
+    users:
+      - name: user1
+        password: "{{ lookup('env', 'password_user1') | password_hash('sha512') }}"
+      - name: user2
+        password: "{{ lookup('env', 'password_user2') | password_hash('sha512') }}"
+      - name: user3
+        password: "{{ lookup('env', 'password_user3') | password_hash('sha512') }}"
+  tasks:
+    - name: Add multiple users with bash shell
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
+        shell: /bin/bash
+        state: present
+      loop: "{{ users }}"
+    
+    - name: homedirs creation
+      file:
+        path: "/home/{{ item.name }}"
+        state: directory
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: "0755"
+      loop: "{{ users }}"
+    
+    - name: Add users to a specific group
+      user:
+        name: "{{ item.name }}"
+        groups: "group1"
+        append: yes
+      loop: "{{ users }}"

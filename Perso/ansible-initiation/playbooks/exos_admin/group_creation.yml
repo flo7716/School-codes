@@ -1,0 +1,14 @@
+- name: group creation
+  hosts: localhost
+  become: true
+  vars:
+    groups:
+      - name: group1
+      - name: group2
+      - name: group3
+  tasks:
+    - name: Add multiple groups
+      ansible.builtin.group:
+        name: "{{ item.name }}"
+        state: present
+      loop: "{{ groups }}"
