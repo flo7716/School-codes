@@ -7,6 +7,13 @@
     state: present
   when: ansible_os_family == "RedHat"
 
+- name: Autoriser connexions établies
+  ansible.builtin.iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+
 - name: Autoriser ports entrants
   ansible.builtin.iptables:
     chain: INPUT
