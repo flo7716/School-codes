@@ -15,9 +15,9 @@ int produit_tableau( int t[nmax], int n ){
     p =1;
     for(i=0; i<n; i=i+1){
         p = p*t[i];
+    }
     return(p);
 }
-
 //----------------------------------
 // Fonction somme
 //----------------------------------
