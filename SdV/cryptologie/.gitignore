@@ -1,2 +1,3 @@
 #ignore all *.pem files in the current directory and all subdirectories
 *.pem
+*.bin
