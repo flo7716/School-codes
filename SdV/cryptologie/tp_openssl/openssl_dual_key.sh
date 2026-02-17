@@ -11,11 +11,7 @@ openssl rsa -pubout -in private_key_generated.pem -out public_key_generated.pem
 echo "Ceci est un message secret à chiffrer." > message.txt
 
 # Chiffrer le message avec la clé publique
-openssl rsautl -encrypt -inkey public_key_generated.pem -pubin -in message.txt -out message_encrypted.bin
-
-# Chiffrer la passphrase avec la clé publique
-echo "MaPassphraseSecrète" > passphrase.txt
-openssl rsautl -encrypt -inkey public_key_generated.pem -pubin -in passphrase.txt -out passphrase_encrypted.bin
+openssl pkeyutl -encrypt -pubin -inkey public_key_generated.pem -in message.txt -out message_encrypted.bin  
 
 # Déchiffrer le message avec la clé privée
-openssl rsautl -decrypt -inkey private_key_generated.pem -in message_encrypted.bin  
+openssl pkeyutl -decrypt -inkey private_key_generated.pem -in message_encrypted.bin -out message_decrypted.txt
