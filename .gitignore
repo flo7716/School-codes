@@ -8,3 +8,5 @@
 .github/instructions/snyk_rules.instructions.md
 
 .fake
+*.csr
+*.key
