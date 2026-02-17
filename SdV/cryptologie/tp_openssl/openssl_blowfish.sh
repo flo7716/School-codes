@@ -1,20 +1,37 @@
 #!/bin/bash
 
-# Déchiffrement du message chiffré avec Blowfish (ici exo5.chiffre avec Key.pem et motDePasse1 dans le sous-dossier exercice5)
-
 EXERCISE_DIR="./exercice5"
-KEY_FILE="${EXERCISE_DIR}/Key.pem"
-INPUT_FILE="${EXERCISE_DIR}/exo5.chiffre"
-OUTPUT_FILE="${EXERCISE_DIR}/exo5_dechiffre.txt"
 
-# Check if key file exists
-if [[ ! -f "$KEY_FILE" ]]; then
-  echo "Error: Key file not found at $KEY_FILE" >&2
-  exit 1
-fi
+RSA_KEY="$EXERCISE_DIR/Key.pem"
+RSA_PASS=$(echo c3VwZGV2aW5jaQo= | base64 -d | tr -d '\n')
 
-openssl enc -d -blowfish -provider default -provider legacy \
-  -in "$INPUT_FILE" \
-  -out "$OUTPUT_FILE" \
-  -pass file:"$KEY_FILE"
+ENC_PASS_FILE="$EXERCISE_DIR/motDePasse1"
+DEC_PASS_FILE="$EXERCISE_DIR/motDePasse1_dechiffre"
 
+INPUT_FILE="$EXERCISE_DIR/exo5.chiffre"
+OUTPUT_FILE="$EXERCISE_DIR/exo5_dechiffre.txt"
+
+echo "[1/2] Déchiffrement du mot de passe Blowfish avec RSA..."
+
+openssl pkeyutl \
+-decrypt \
+-provider default -provider legacy \
+-inkey "$RSA_KEY" \
+-in "$ENC_PASS_FILE" \
+-out "$DEC_PASS_FILE" \
+-passin pass:"$RSA_PASS"
+
+echo "[2/2] Déchiffrement Blowfish..."
+
+BLOWFISH_PASS=$(tr -d '\n' < "$DEC_PASS_FILE")
+
+openssl enc \
+-provider default -provider legacy \
+-d \
+-bf-cbc \
+-iv 0000000000000000 \
+-in "$INPUT_FILE" \
+-out "$OUTPUT_FILE" \
+-pass pass:"$BLOWFISH_PASS"
+
+echo "Déchiffrement terminé : $OUTPUT_FILE"
