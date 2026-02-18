@@ -9,4 +9,5 @@
 
 .fake
 *.csr
+*.crt
 *.key

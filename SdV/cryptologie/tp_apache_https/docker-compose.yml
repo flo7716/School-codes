@@ -1,0 +1,15 @@
+#Mise en place d'une application client/serveur web non-sécurisée sur serveur Apache2 avecUbuntu
+
+version: '3.8'
+
+services:
+  apache:
+    build: .
+    container_name: tp_apache
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./www:/var/www
+      - ./ssl:/etc/apache2/ssl
+    restart: always
