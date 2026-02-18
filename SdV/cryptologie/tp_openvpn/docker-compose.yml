@@ -1,18 +1,17 @@
----
 version: "2.1"
 services:
   openvpn-as:
     image: openvpn/openvpn-as
     container_name: openvpn-as
     devices:
-      - /dev/net/tun:/dev/net/tun
+      - /dev/net/tun:/dev/net/tun   # nécessaire pour VPN
     cap_add:
       - NET_ADMIN
       - MKNOD
     ports:
-      - 943:943
-      - 443:443
-      - 1194:1194/udp
+      - 943:943        # interface web Admin/User
+      - 443:443        # VPN HTTPS
+      - 1194:1194/udp  # VPN UDP classique
     volumes:
-      - ./ovpn_data:/openvpn
+      - ./ovpn_data:/openvpn   # stockage persistant des configs et certificats
     restart: unless-stopped
