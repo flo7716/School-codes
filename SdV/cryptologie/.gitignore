@@ -3,3 +3,5 @@
 *.bin
 *.srl
 *.asc
+
+./tp_openvpn/ovpn_data/*
