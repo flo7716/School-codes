@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   openvpn:
-    image: kylemanna/openvpn
+    image: openvpn/openvpn:3.4
     container_name: openvpn
     cap_add:
       - NET_ADMIN
