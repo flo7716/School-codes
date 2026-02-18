@@ -1,11 +1,18 @@
+---
+version: "2.1"
 services:
-  openvpn:
-    image: openvpn/openvpn:3.4
-    container_name: openvpn
+  openvpn-as:
+    image: openvpn/openvpn-as
+    container_name: openvpn-as
+    devices:
+      - /dev/net/tun:/dev/net/tun
     cap_add:
       - NET_ADMIN
+      - MKNOD
     ports:
-      - "1194:1194/udp"
+      - 943:943
+      - 443:443
+      - 1194:1194/udp
     volumes:
-      - ./ovpn-data:/etc/openvpn
+      - ./ovpn_data:/openvpn
     restart: unless-stopped
