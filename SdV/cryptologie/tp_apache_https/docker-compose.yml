@@ -12,4 +12,5 @@ services:
     volumes:
       - ./www:/var/www
       - ./ssl:/etc/apache2/ssl
+      - ./ssl/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
     restart: always
