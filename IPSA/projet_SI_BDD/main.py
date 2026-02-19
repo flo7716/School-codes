@@ -6,6 +6,14 @@ import Projet_base_de_donnees as projet
 app = FastAPI()
 connection, cursor = projet.connect_database()
 
+# Whitelist of allowed entity names to prevent SQL injection
+ALLOWED_ENTITIES = {"users", "products", "orders", "customers"}  # Add your actual table names
+
+def validate_entity(entity: str) -> None:
+    """Validate that entity name is in the whitelist"""
+    if entity.lower() not in ALLOWED_ENTITIES:
+        raise HTTPException(status_code=400, detail="Invalid entity name")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -22,6 +30,8 @@ def read_root():
 @app.post("/add/{entity}")
 def add_entity(entity: str, data: Dict[str, Any] = Form(...)):
     try:
+        # Validate entity name to prevent SQL injection
+        validate_entity(entity)
         # Add the entity to the database
         projet.add_entity(entity, data)
         return {"message": f"{entity.capitalize()} added successfully"}
@@ -31,6 +41,8 @@ def add_entity(entity: str, data: Dict[str, Any] = Form(...)):
 @app.get("/get_all/{entity}")
 def get_all_entities(entity: str):
     try:
+        # Validate entity name to prevent SQL injection
+        validate_entity(entity)
         # Retrieve all entities from the database
         entities = projet.get_all_entities(entity)
         return {f"{entity}s": entities}
@@ -40,6 +52,8 @@ def get_all_entities(entity: str):
 @app.get("/get/{entity}/{entity_id}")
 def get_entity_by_id(entity: str, entity_id: int):
     try:
+        # Validate entity name to prevent SQL injection
+        validate_entity(entity)
         # Retrieve a specific entity by ID
         result = projet.get_entity_by_id(entity, entity_id)
         if not result:
@@ -51,6 +65,8 @@ def get_entity_by_id(entity: str, entity_id: int):
 @app.put("/update/{entity}/{entity_id}")
 def update_entity(entity: str, entity_id: int, data: Dict[str, Any] = Form(...)):
     try:
+        # Validate entity name to prevent SQL injection
+        validate_entity(entity)
         # Update the entity in the database
         projet.update_entity(entity, entity_id, data)
         return {"message": f"{entity.capitalize()} updated successfully"}
@@ -60,6 +76,8 @@ def update_entity(entity: str, entity_id: int, data: Dict[str, Any] = Form(...))
 @app.delete("/delete/{entity}/{entity_id}")
 def delete_entity(entity: str, entity_id: int):
     try:
+        # Validate entity name to prevent SQL injection
+        validate_entity(entity)
         # Delete the entity from the database
         projet.delete_entity(entity, entity_id)
         return {"message": f"{entity.capitalize()} deleted successfully"}
