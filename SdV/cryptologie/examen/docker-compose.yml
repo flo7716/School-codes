@@ -1,0 +1,17 @@
+#Generation image docker ubuntu pour l'examen de cryptologie (à l'aide du dockerfile)
+version: '3'
+services:
+  ubuntu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ubuntu
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/home/ubuntu
+    command: bash
+    ports:
+      - "8080:8080"
+    
+
