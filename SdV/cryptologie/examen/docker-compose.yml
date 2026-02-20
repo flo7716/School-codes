@@ -9,7 +9,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - .:/home/ubuntu
+      - .:/home/florian
     command: bash
     ports:
       - "8080:8080"
