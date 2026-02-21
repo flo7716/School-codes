@@ -50,5 +50,6 @@
     "python-envs.pythonProjects": [],
     "ansible.python.interpreterPath": "/bin/python",
     "snyk.advanced.organization": "f49556b9-fc07-420a-8195-1b49ddacb5a4",
-    "snyk.advanced.autoSelectOrganization": true
+    "snyk.advanced.autoSelectOrganization": true,
+    "C_Cpp.errorSquiggles": "disabled"
 }
