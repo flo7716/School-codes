@@ -4,6 +4,8 @@
 using namespace std;
 int main() {
     int M[10][10];
+    int somme_res[10][10];
+    int produit_res[10][10];
     int n, m;
     m = saisir_nb_lignes();
     n = saisir_nb_colonnes();
@@ -13,8 +15,8 @@ int main() {
     cout << "\n la moyenne des elements de la matrice M est : " << moyenne(M, m, n);
     cout << "\n le plus petit element de la matrice M est : " << minimum_matrice(M, m, n) << " .\n Il est situe en " << pos_minimum_matrice(M, m, n);
     cout << "\n le plus grand element de la matrice M est : " << maximum_matrice(M, m, n) << " .\n Il est situe en " << pos_maximum_matrice(M, m, n);
-    somme_matrice(M, m, n);
-    produit_matrice(M, m, n);
+    somme_matrice(M, M, somme_res, m, n);
+    produit_matrice(M, M, produit_res, m, n);
 
     return 0;
 }
