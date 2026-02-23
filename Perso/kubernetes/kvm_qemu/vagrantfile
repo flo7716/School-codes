@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+## Script with KVM/QEMU provider, adapted from the VirtualBox version
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/debian-12"
+  config.vm.provider "kvm" do |kvm|
+    kvm.memory = 2048
+    kvm.cpus = 2
+  end
+
+  # ---------------------
+  # MASTER NODE
+  # ---------------------
+  config.vm.define "master" do |node|
+    node.vm.hostname = "master"
+    node.vm.network "private_network", ip: "192.168.56.10"
+
+    # Ports uniquement sur master
+    node.vm.network "forwarded_port", guest: 8001, host: 3031, auto_correct: true
+    node.vm.network "forwarded_port", guest: 80, host: 8081, auto_correct: true
+    node.vm.network "forwarded_port", guest: 3000, host: 3001, auto_correct: true
+
+    node.vm.synced_folder ".", "/home/vagrant/shared", disabled: false
+  end
+
+  # ---------------------
+  # NODE 1
+  # ---------------------
+  config.vm.define "node1" do |node|
+    node.vm.hostname = "node1"
+    node.vm.network "private_network", ip: "192.168.56.11"
+    node.vm.synced_folder ".", "/home/vagrant/shared", disabled: false
+  end
+
+  # ---------------------
+  # NODE 2
+  # ---------------------
+  config.vm.define "node2" do |node|
+    node.vm.hostname = "node2"
+    node.vm.network "private_network", ip: "192.168.56.12"
+    node.vm.synced_folder ".", "/home/vagrant/shared"
+  end
+
+  # ---------------------
+  # PROVISIONING SCRIPTS
+  # ---------------------
+  config.vm.provision "shell", name: "disable-swap",             path: "../scripts/disable-swap.sh", privileged: true
+  config.vm.provision "shell", name: "install-essential-tools",  path: "../scripts/install-essential-tools.sh", privileged: true
+  config.vm.provision "shell", name: "allow-bridge-nf-traffic",  path: "../scripts/allow-bridge-nf-traffic.sh", privileged: true
+  config.vm.provision "shell", name: "install-containerd",       path: "../scripts/install-containerd.sh", privileged: true
+  config.vm.provision "shell", name: "install-kubeadm",          path: "../scripts/install-kubeadm.sh", privileged: true
+  config.vm.provision "shell", name: "update-kubelet-config",    path: "../scripts/update-kubelet-config.sh", args: ["eth1"], privileged: true
+end
