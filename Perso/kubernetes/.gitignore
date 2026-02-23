@@ -11,5 +11,5 @@
 *.rej
 
 # ignore vagrant and kubernetes runtime directories
-/.vagrant/
-/.kubernetes/
+*/.vagrant/
+*/.kubernetes/
