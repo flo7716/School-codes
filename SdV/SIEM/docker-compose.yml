@@ -137,3 +137,21 @@ services:
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+
+ elastic-agent:
+  image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+  container_name: elastic-agent
+  user: root
+  depends_on:
+    kibana:
+      condition: service_healthy
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock       # Accès aux containers Docker
+    - /proc:/hostfs/proc:ro
+    - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+    - /:/hostfs:ro
+  environment:
+    - FLEET_ENROLL=1
+    - FLEET_URL=https://kibana:5601
+    - FLEET_ENROLLMENT_TOKEN=${FLEET_TOKEN}          # À récupérer dans Kibana
+    - FLEET_INSECURE=true                             # Si certificat auto-signé
