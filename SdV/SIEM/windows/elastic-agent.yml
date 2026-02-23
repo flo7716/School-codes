@@ -1,0 +1,576 @@
+id: 3f97bb30-10cb-11f1-bace-b10a6416b5a5
+revision: 2
+outputs:
+  default:
+    type: elasticsearch
+    hosts:
+      - 'http://localhost:9200'
+    username: '${ES_USERNAME}'
+    password: '${ES_PASSWORD}'
+output_permissions:
+  default:
+    _elastic_agent_monitoring:
+      indices:
+        - names:
+            - logs-elastic_agent.apm_server-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.apm_server-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.auditbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.auditbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.cloud_defend-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.cloudbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.cloudbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.elastic_agent-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.endpoint_security-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.endpoint_security-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.filebeat_input-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.filebeat_input-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.filebeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.filebeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.fleet_server-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.fleet_server-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.heartbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.heartbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.metricbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.metricbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.osquerybeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.osquerybeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-elastic_agent.packetbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-elastic_agent.packetbeat-default
+          privileges:
+            - auto_configure
+            - create_doc
+    _elastic_agent_checks:
+      cluster:
+        - monitor
+    ac959347-52f9-49a7-a549-886e12deafff:
+      indices:
+        - names:
+            - logs-system.auth-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-system.syslog-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-system.application-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-system.security-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-system.system-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.cpu-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.diskio-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.filesystem-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.fsstat-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.load-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.memory-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.network-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.process-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.process.summary-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.socket_summary-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-system.uptime-default
+          privileges:
+            - auto_configure
+            - create_doc
+    6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540:
+      indices:
+        - names:
+            - logs-windows.forwarded-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-windows.powershell-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-windows.powershell_operational-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - logs-windows.sysmon_operational-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-windows.perfmon-default
+          privileges:
+            - auto_configure
+            - create_doc
+        - names:
+            - metrics-windows.service-default
+          privileges:
+            - auto_configure
+            - create_doc
+agent:
+  download:
+    sourceURI: 'https://artifacts.elastic.co/downloads/'
+  monitoring:
+    enabled: true
+    use_output: default
+    namespace: default
+    logs: true
+    metrics: true
+  features: {}
+inputs:
+  - id: logfile-system-ac959347-52f9-49a7-a549-886e12deafff
+    name: system-2
+    revision: 1
+    type: logfile
+    use_output: default
+    meta:
+      package:
+        name: system
+        version: 1.31.1
+    data_stream:
+      namespace: default
+    package_policy_id: ac959347-52f9-49a7-a549-886e12deafff
+    streams:
+      - id: logfile-system.auth-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.auth
+          type: logs
+        ignore_older: 72h
+        paths:
+          - /var/log/auth.log*
+          - /var/log/secure*
+        exclude_files:
+          - .gz$
+        multiline:
+          pattern: ^\s
+          match: after
+        tags:
+          - system-auth
+        processors:
+          - add_locale: null
+      - id: logfile-system.syslog-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.syslog
+          type: logs
+        paths:
+          - /var/log/messages*
+          - /var/log/syslog*
+          - /var/log/system*
+        exclude_files:
+          - .gz$
+        multiline:
+          pattern: ^\s
+          match: after
+        processors:
+          - add_locale: null
+        ignore_older: 72h
+  - id: winlog-system-ac959347-52f9-49a7-a549-886e12deafff
+    name: system-2
+    revision: 1
+    type: winlog
+    use_output: default
+    meta:
+      package:
+        name: system
+        version: 1.31.1
+    data_stream:
+      namespace: default
+    package_policy_id: ac959347-52f9-49a7-a549-886e12deafff
+    streams:
+      - id: winlog-system.application-ac959347-52f9-49a7-a549-886e12deafff
+        name: Application
+        data_stream:
+          dataset: system.application
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        ignore_older: 72h
+      - id: winlog-system.security-ac959347-52f9-49a7-a549-886e12deafff
+        name: Security
+        data_stream:
+          dataset: system.security
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        ignore_older: 72h
+      - id: winlog-system.system-ac959347-52f9-49a7-a549-886e12deafff
+        name: System
+        data_stream:
+          dataset: system.system
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        ignore_older: 72h
+  - id: system/metrics-system-ac959347-52f9-49a7-a549-886e12deafff
+    name: system-2
+    revision: 1
+    type: system/metrics
+    use_output: default
+    meta:
+      package:
+        name: system
+        version: 1.31.1
+    data_stream:
+      namespace: default
+    package_policy_id: ac959347-52f9-49a7-a549-886e12deafff
+    streams:
+      - id: system/metrics-system.cpu-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.cpu
+          type: metrics
+        metricsets:
+          - cpu
+        cpu.metrics:
+          - percentages
+          - normalized_percentages
+        period: 10s
+      - id: system/metrics-system.diskio-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.diskio
+          type: metrics
+        metricsets:
+          - diskio
+        diskio.include_devices: null
+        period: 10s
+      - id: system/metrics-system.filesystem-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.filesystem
+          type: metrics
+        metricsets:
+          - filesystem
+        period: 1m
+        processors:
+          - drop_event.when.regexp:
+              system.filesystem.mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)
+      - id: system/metrics-system.fsstat-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.fsstat
+          type: metrics
+        metricsets:
+          - fsstat
+        period: 1m
+        processors:
+          - drop_event.when.regexp:
+              system.fsstat.mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)
+      - id: system/metrics-system.load-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.load
+          type: metrics
+        metricsets:
+          - load
+        condition: '${host.platform} != ''windows'''
+        period: 10s
+      - id: system/metrics-system.memory-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.memory
+          type: metrics
+        metricsets:
+          - memory
+        period: 10s
+      - id: system/metrics-system.network-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.network
+          type: metrics
+        metricsets:
+          - network
+        period: 10s
+        network.interfaces: null
+      - id: system/metrics-system.process-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.process
+          type: metrics
+        metricsets:
+          - process
+        period: 10s
+        process.include_top_n.by_cpu: 5
+        process.include_top_n.by_memory: 5
+        process.cmdline.cache.enabled: true
+        process.cgroups.enabled: false
+        process.include_cpu_ticks: false
+        processes:
+          - .*
+      - id: >-
+          system/metrics-system.process.summary-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.process.summary
+          type: metrics
+        metricsets:
+          - process_summary
+        period: 10s
+      - id: >-
+          system/metrics-system.socket_summary-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.socket_summary
+          type: metrics
+        metricsets:
+          - socket_summary
+        period: 10s
+      - id: system/metrics-system.uptime-ac959347-52f9-49a7-a549-886e12deafff
+        data_stream:
+          dataset: system.uptime
+          type: metrics
+        metricsets:
+          - uptime
+        period: 10s
+  - id: winlog-windows-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+    name: windows-1
+    revision: 1
+    type: winlog
+    use_output: default
+    meta:
+      package:
+        name: windows
+        version: 1.35.0
+    data_stream:
+      namespace: default
+    package_policy_id: 6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+    streams:
+      - id: winlog-windows.forwarded-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+        name: ForwardedEvents
+        data_stream:
+          dataset: windows.forwarded
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        ignore_older: 72h
+        tags:
+          - forwarded
+        publisher_pipeline.disable_host: true
+        processors:
+          - translate_sid:
+              field: winlog.event_data.MemberSid
+              account_name_target: winlog.event_data._MemberUserName
+              domain_target: winlog.event_data._MemberDomain
+              account_type_target: winlog.event_data._MemberAccountType
+              ignore_missing: true
+              ignore_failure: true
+      - id: winlog-windows.powershell-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+        name: Windows PowerShell
+        data_stream:
+          dataset: windows.powershell
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        event_id: '400, 403, 600, 800'
+        ignore_older: 72h
+        processors:
+          - translate_sid:
+              field: winlog.event_data.MemberSid
+              account_name_target: winlog.event_data._MemberUserName
+              domain_target: winlog.event_data._MemberDomain
+              account_type_target: winlog.event_data._MemberAccountType
+              ignore_missing: true
+              ignore_failure: true
+      - id: >-
+          winlog-windows.powershell_operational-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+        name: Microsoft-Windows-PowerShell/Operational
+        data_stream:
+          dataset: windows.powershell_operational
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        event_id: '4103, 4104, 4105, 4106'
+        ignore_older: 72h
+        processors:
+          - translate_sid:
+              field: winlog.event_data.MemberSid
+              account_name_target: winlog.event_data._MemberUserName
+              domain_target: winlog.event_data._MemberDomain
+              account_type_target: winlog.event_data._MemberAccountType
+              ignore_missing: true
+              ignore_failure: true
+      - id: winlog-windows.sysmon_operational-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+        name: Microsoft-Windows-Sysmon/Operational
+        data_stream:
+          dataset: windows.sysmon_operational
+          type: logs
+        condition: '${host.platform} == ''windows'''
+        ignore_older: 72h
+        processors:
+          - translate_sid:
+              field: winlog.event_data.MemberSid
+              account_name_target: winlog.event_data._MemberUserName
+              domain_target: winlog.event_data._MemberDomain
+              account_type_target: winlog.event_data._MemberAccountType
+              ignore_missing: true
+              ignore_failure: true
+  - id: windows/metrics-windows-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+    name: windows-1
+    revision: 1
+    type: windows/metrics
+    use_output: default
+    meta:
+      package:
+        name: windows
+        version: 1.35.0
+    data_stream:
+      namespace: default
+    package_policy_id: 6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+    streams:
+      - id: windows/metrics-windows.perfmon-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+        data_stream:
+          dataset: windows.perfmon
+          type: metrics
+        metricsets:
+          - perfmon
+        condition: '${host.platform} == ''windows'''
+        perfmon.group_measurements_by_instance: false
+        perfmon.ignore_non_existent_counters: false
+        perfmon.queries:
+          - object: Process
+            instance:
+              - '*'
+            counters:
+              - name: '% Processor Time'
+                field: cpu_perc
+                format: float
+              - name: Working Set
+        period: 10s
+      - id: windows/metrics-windows.service-6dc0e6bf-4ebb-42fa-9d9a-86a392ecb540
+        data_stream:
+          dataset: windows.service
+          type: metrics
+        metricsets:
+          - service
+        condition: '${host.platform} == ''windows'''
+        period: 60s
