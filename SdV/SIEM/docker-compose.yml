@@ -120,4 +120,8 @@ services:
        ]
      interval: 10s
      timeout: 10s
-     retries: 120
+     retries: 120 
+ kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    ports:
+      - 5601:5601
