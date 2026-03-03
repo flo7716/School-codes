@@ -11,3 +11,4 @@
 *.csr
 *.crt
 *.key
+*.gpg
