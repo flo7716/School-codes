@@ -3,7 +3,7 @@
 # Check if the script is run as root
 if [ "$EUID" -ne 0 ]; then
   echo "Please run as root"
-  exit
+  exit 1
 fi
 
 
@@ -18,3 +18,5 @@ echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4
 
 # Check if the repository was added successfully
 apt-get update
+
+exit 0
