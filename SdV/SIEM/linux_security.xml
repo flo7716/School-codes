@@ -1,0 +1,100 @@
+<group name="linux_security_alerts">
+
+  <rule id="100003" level="10" frequency="8" timeframe="120">
+    <if_matched_sid>5710</if_matched_sid> 
+    <same_source_ip />
+    <description>Brute force SSH détecté - IP: $(srcip)</description>
+  </rule>
+
+  <rule id="100102" level="9">
+    <if_sid>5402, 5406</if_sid>
+    <match i="yes">not allowed|not in sudoers</match>
+    <description>Alerte : Tentative d'utilisation de SUDO non autorisée par $(user)</description>
+  </rule>
+
+  <rule id="100511" level="9">
+    <if_sid>510, 5402, 5300</if_sid>
+    <match>su: auth failure</match>
+    <description>Alerte : Échec d'authentification via la commande 'su' (Tentative Root)</description>
+  </rule>
+
+  <rule id="100201" level="8">
+    <if_sid>5901, 5402</if_sid> 
+    <match>new user|adduser</match>
+    <description>Nouvel utilisateur créé sur le système</description>
+  </rule>
+
+  <rule id="100515" level="8">
+    <if_sid>550</if_sid>
+    <field name="file">^/etc/group</field>
+    <description>FIM : Modification suspecte du fichier /etc/group (Privilèges)</description>
+  </rule>
+
+
+  <rule id="100100" level="15">
+    <if_sid>550, 554</if_sid>
+    <match>/etc/passwd</match>
+    <description>Modification critique : fichier d'utilisateurs modifié ($(file))</description>
+  </rule>
+
+  <rule id="100101" level="15">
+    <if_sid>550, 554</if_sid>
+    <match>authorized_keys</match>
+    <description>Alerte : Modification ou ajout d'une clé SSH dans $(file)</description>
+  </rule>
+
+  <rule id="100512" level="8">
+    <if_sid>510, 5402, 550</if_sid>
+    <match>/etc/hosts</match>
+    <description>FIM : Modification du fichier /etc/hosts détectée (Possible empoisonnement DNS)</description>
+  </rule>
+
+  <rule id="100505" level="10">
+    <if_sid>550, 554</if_sid>
+    <match>/etc/cron|/var/spool/cron</match>
+    <description>Modification des tâches planifiées détectée (Persistance)</description>
+  </rule>
+
+
+  <rule id="100503" level="12">
+    <if_sid>510, 5402</if_sid>
+    <match>/etc/shadow|/etc/gshadow</match>
+    <description>ALERTE CRITIQUE : Accès ou lecture de fichiers de mots de passe</description>
+  </rule>
+
+  <rule id="100104" level="10">
+    <if_sid>5402, 510</if_sid>
+    <match>promiscuous mode|promisc on</match>
+    <description>Interface réseau en mode sniffing (promiscuous)</description>
+  </rule>
+
+  <rule id="100204" level="7">
+    <if_sid>80700</if_sid>
+    <match>nmap</match>
+    <description>Auditd: Exécution de Nmap détectée (utilisateur standard)</description>
+  </rule>
+
+  <rule id="100401" level="12">
+    <if_sid>5402, 510</if_sid>
+    <match>ufw disable|ufw stop</match>
+    <description>ALERTE : Tentative de désactivation du pare-feu (via sudo ou direct)</description>
+  </rule>
+
+  <rule id="100501" level="9">
+    <if_sid>510, 5402</if_sid>
+    <match>find / -perm -4000|find / -user root -perm -4000</match>
+    <description>Recherche de fichiers SUID détectée (Tentative d'escalade de privilèges)</description>
+  </rule>
+
+  <rule id="100508" level="10">
+    <if_sid>5402, 510, 550</if_sid> <field name="perm">rwxrwxrwx</field>
+    <description>FIM : Permissions critiques détectées (777) sur $(file)</description>
+  </rule>
+
+  <rule id="100513" level="7">
+    <if_sid>550</if_sid>
+    <field name="file">^/tmp/\.</field>
+    <description>FIM : Activité suspecte sur un fichier caché dans /tmp</description>
+  </rule>
+
+</group>
