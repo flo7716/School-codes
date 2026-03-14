@@ -1,5 +1,5 @@
 #include <iostream>
-#include "biblio.h"
+#include "bibliopointeur.h"
 
 //----------------------------------------------
 //Florian ANDRE
@@ -10,8 +10,10 @@
 int main()
 {
     int x,y,mini,maxi,n;
-    cout<<"Saisissez x et y : ";
-    cin>>x>>y;
+    cout<<"Saisissez x ";
+    cin>>x;
+    cout<<"Saisissez y ";
+    cin>>y;
     echange(&x,&y);
     min_max(x,y,&maxi,&mini);
     cout<<"\nLe maximum est : "<<maxi;
