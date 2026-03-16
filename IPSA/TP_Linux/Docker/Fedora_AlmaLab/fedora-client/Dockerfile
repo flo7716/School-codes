@@ -8,6 +8,7 @@ RUN dnf -y update && \
     nano \
     iputils \
     iproute \
+    curl \
     && dnf clean all
 
 CMD ["sleep","infinity"]
