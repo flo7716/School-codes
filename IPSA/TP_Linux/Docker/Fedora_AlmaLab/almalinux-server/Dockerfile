@@ -8,7 +8,7 @@ RUN dnf -y update && \
     nano \
     iputils \
     iproute \
-    curl \
+    curl-minimal \
     && dnf clean all
 
 RUN ssh-keygen -A
