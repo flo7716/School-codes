@@ -9,14 +9,23 @@ services:
     privileged: true
     environment:
       IPA_SERVER_HOSTNAME: ipa.lab.local
+      IPA_SERVER_DOMAIN: lab.local
+      IPA_SERVER_REALM: LAB.LOCAL
       PASSWORD: adminpass
+    command: >
+      ipa-server-install
+      --unattended
+      --realm=LAB.LOCAL
+      --domain=lab.local
+      --hostname=ipa.lab.local
+      --setup-dns
+      --no-forwarders
+      --ds-password=adminpass
+      --admin-password=adminpass
     networks:
       labnet:
         ipv4_address: 172.20.0.10
-    ports:
-      - "8080:80"
-      - "8443:443"
-
+        
   almalinux_srv:
     build: ./almalinux-server
     container_name: almalinux_srv
