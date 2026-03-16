@@ -1,31 +1,24 @@
 version: "3.9"
 
 services:
-
   ipa:
     image: freeipa/freeipa-server:rocky-9
     container_name: ipa_server
-    hostname: ipa.lab.local
+    hostname: ${IPA_HOSTNAME}
     privileged: true
     environment:
-      IPA_SERVER_HOSTNAME: ipa.lab.local
-      IPA_SERVER_DOMAIN: lab.local
-      IPA_SERVER_REALM: LAB.LOCAL
-      PASSWORD: adminpass
+      IPA_SERVER_HOSTNAME: ${IPA_HOSTNAME}
     command: >
       ipa-server-install
       --unattended
-      --realm=LAB.LOCAL
-      --domain=lab.local
-      --hostname=ipa.lab.local
+      --realm=${IPA_REALM}
+      --domain=${IPA_DOMAIN}
+      --hostname=${IPA_HOSTNAME}
+      --ds-password=${IPA_DS_PASSWORD}
+      --admin-password=${IPA_ADMIN_PASSWORD}
       --setup-dns
-      --no-forwarders
-      --ds-password=adminpass
-      --admin-password=adminpass
-    networks:
-      labnet:
-        ipv4_address: 172.20.0.10
-        
+      --no-client
+
   almalinux_srv:
     build: ./almalinux-server
     container_name: almalinux_srv
