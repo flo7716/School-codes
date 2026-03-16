@@ -2,15 +2,15 @@ FROM almalinux:9
 
 RUN dnf -y update && \
     dnf -y install \
+    freeipa-server \
+    freeipa-server-dns \
     openssh-server \
     sudo \
+    nano \
     iproute \
     iputils \
-    nano \
-    python3 \
     && dnf clean all
 
-# config ssh simple
 RUN ssh-keygen -A
 
-CMD ["/usr/sbin/sshd","-D"]
+CMD ["/usr/sbin/init"]
