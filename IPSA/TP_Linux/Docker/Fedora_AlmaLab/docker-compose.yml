@@ -2,17 +2,28 @@ version: "3.9"
 
 services:
 
-  server:
-    build: ./almalinux-server
-    container_name: almalinux_server
+  ipa:
+    image: freeipa/freeipa-server:rocky-9
+    container_name: ipa_server
     hostname: ipa.lab.local
     privileged: true
+    environment:
+      IPA_SERVER_HOSTNAME: ipa.lab.local
+      PASSWORD: adminpass
     networks:
       labnet:
         ipv4_address: 172.20.0.10
     ports:
       - "8080:80"
       - "8443:443"
+
+  almalinux_srv:
+    build: ./almalinux-server
+    container_name: almalinux_srv
+    hostname: srv.lab.local
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.11
 
   client1:
     build: ./fedora-client
