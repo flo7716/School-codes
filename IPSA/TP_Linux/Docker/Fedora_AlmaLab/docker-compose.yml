@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+
+  server:
+    build: ./almalinux-server
+    container_name: almalinux_server
+    hostname: server
+    networks:
+      - labnet
+    ports:
+      - "2222:22"
+
+  client1:
+    build: ./fedora-client
+    container_name: fedora_client1
+    hostname: client1
+    networks:
+      - labnet
+
+  client2:
+    build: ./fedora-client
+    container_name: fedora_client2
+    hostname: client2
+    networks:
+      - labnet
+
+networks:
+  labnet:
+    driver: bridge
