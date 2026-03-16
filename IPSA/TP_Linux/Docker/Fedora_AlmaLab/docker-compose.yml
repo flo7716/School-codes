@@ -8,6 +8,12 @@ services:
     privileged: true
     environment:
       IPA_SERVER_HOSTNAME: ${IPA_HOSTNAME}
+      IPA_SERVER_DOMAIN: ${IPA_DOMAIN}
+      IPA_SERVER_REALM: ${IPA_REALM}
+      PASSWORD: ${IPA_ADMIN_PASSWORD}
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.10
     command: >
       ipa-server-install
       --unattended
@@ -26,6 +32,8 @@ services:
     networks:
       labnet:
         ipv4_address: 172.20.0.11
+    extra_hosts:
+      - "ipa.lab.local:172.20.0.10"
 
   client1:
     build: ./fedora-client
@@ -34,6 +42,8 @@ services:
     networks:
       labnet:
         ipv4_address: 172.20.0.21
+    extra_hosts:
+      - "ipa.lab.local:172.20.0.10"
 
   client2:
     build: ./fedora-client
@@ -42,6 +52,8 @@ services:
     networks:
       labnet:
         ipv4_address: 172.20.0.22
+    extra_hosts:
+      - "ipa.lab.local:172.20.0.10"
 
 networks:
   labnet:
