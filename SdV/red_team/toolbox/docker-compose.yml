@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Cible 1 : Un serveur web vulnérable (DVWA) sur une IP fixe
+  target-web:
+    image: vulnerables/web-dvwa
+    container_name: target_http_server
+    networks:
+      pentest_net:
+        ipv4_address: 192.168.56.10
+    ports:
+      - "80:80"
+    restart: always
+
+  # Cible 2 : Un conteneur Ubuntu avec SSH actif pour le scan de ports
+  target-ssh:
+    image: lscr.io/linuxserver/openssh-server:latest
+    container_name: target_ssh_server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - PASSWORD_ACCESS=true
+      - USER_PASSWORD=password123 # Mot de passe de test
+    networks:
+      pentest_net:
+        ipv4_address: 192.168.56.20
+    ports:
+      - "2222:22"
+    restart: always
+
+# Configuration du sous-réseau strict demandé par le TP
+networks:
+  pentest_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.56.0/24
