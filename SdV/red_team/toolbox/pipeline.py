@@ -1,70 +1,64 @@
 import recon
 import scanner
 import web_enum
-import os
 
 def main():
-    print("=" * 60)
-    print("        TOOLBOX PENTEST PYTHON AUTOMATIQUE")
-    print("=" * 60)
+    print("=" * 65)
+    print("        PHASE 4 : EXECUTION DU PIPELINE DE PENTEST GLOBAL")
+    print("=" * 65)
     
-    # Structure globale pour stocker le rapport final
-    report = {}
+    # Structure globale pour collecter toutes les métriques du rapport final
+    pipeline_report = {}
 
-    # Phase 1: Reconnaissance réseau
-    # (Note : Ajustez la plage "start" et "end" si vous voulez tester plus vite en lab)
+    # Étape 1 : Reconnaissance réseau automatique
+    # (Note : Modifiez start=1 et end=25 en lab pour une démonstration ultra rapide)
     active_ips = recon.scan_network(subnet="192.168.56", start=1, end=20)
     
     if not active_ips:
-        print("[-] Aucune machine active détectée. Fin du pipeline.")
+        print("\n[-] Aucune machine active détectée sur le scope. Arrêt du pipeline.")
         return
 
-    # Phase 2 & 3: Boucle sur chaque machine trouvée
+    # Étape 2 & 3 : Chaînage automatique pour chaque machine trouvée
     for ip in active_ips:
-        report[ip] = {
-            "ports": {},
-            "web": {}
-        }
+        pipeline_report[ip] = {"ports": {}, "web": {}}
         
-        # Lancement du scan de ports
+        # Lancement automatique du scanner de ports (20-1024)
         open_ports = scanner.scan_host_ports(ip, start_port=20, end_port=1024)
-        report[ip]["ports"] = open_ports
+        pipeline_report[ip]["ports"] = open_ports
         
-        # Phase 3 conditionnelle: Si un service web est détecté
+        # Étape 3 Conditionnelle : Si le port 80 (HTTP) ou 443 (HTTPS) est ouvert
         if 80 in open_ports or 443 in open_ports:
             web_port = 80 if 80 in open_ports else 443
-            web_info = web_enum.enum_web(ip, port=web_port)
-            report[ip]["web"] = web_info
+            web_data = web_enum.enum_web(ip, port=web_port)
+            pipeline_report[ip]["web"] = web_data
 
-    # Phase 4: Résumé final (Critère important d'évaluation)
-    print("\n" + "=" * 60)
-    print("                      RÉSUMÉ FINAL")
-    print("=" * 60)
+    # Étape 4 : Affichage du Résumé Final (Contrainte Clé)
+    print("\n" + "=" * 65)
+    print("                      RÉSUMÉ FINAL DU PENTEST")
+    print("=" * 65)
     
-    for ip, data in report.items():
-        print(f"\nHôte : {ip}")
-        print(f" └── Ports Ouverts : {list(data['ports'].keys()) or 'Aucun'}")
+    for ip, data in pipeline_report.items():
+        print(f"\n[+] IP ACTIVE : {ip}")
         
-        if data['web']:
-            print(" └── Énumération Web :")
-            for path, details in data['web'].items():
-                print(f"     ├── {path} -> Code {details['status']}")
-
-    # Phase 5: Sauvegarde du rapport dans un fichier
-    report_file = "rapport_final.txt"
-    with open(report_file, "w") as f:
-        f.write("RAPPORT FINAL DE L'OUTIL PENTEST\n")
-        f.write("=" * 60 + "\n")
-        for ip, data in report.items():
-            f.write(f"\nHôte : {ip}\n")
-            f.write(f" └── Ports Ouverts : {list(data['ports'].keys()) or 'Aucun'}\n")
-            if data['web']:
-                f.write(" └── Énumération Web :\n")
-                for path, details in data['web'].items():
-                    f.write(f"     ├── {path} -> Code {details['status']}\n")
+        # Affichage des ports et services associés
+        if data["ports"]:
+            print("    └── 🔓 Ports ouverts détectés :")
+            for port, service in data["ports"].items():
+                print(f"        ├── Port {port} -> Service: {service}")
+        else:
+            print("    └── 🔒 Aucun port ouvert trouvé dans la plage 20-1024.")
+            
+        # Affichage des résultats de l'énumération Web
+        if data["web"]:
+            print("    └── 🌐 Services Web / Chemins énumérés :")
+            for path, details in data["web"].items():
+                status_code = details["status"]
+                # Formatage visuel pour mettre en évidence les dossiers existants (Hors 404)
+                flag = "⚠️  [ALERT]" if status_code in [200, 301, 302, 403] else "[NOT FOUND]"
+                print(f"        ├── Path: {path:12} -> Code {status_code} {flag}")
                 
-    print("\n" + "=" * 60)
-    print("[*] Fin du traitement. Rapport généré avec succès.")
+    print("\n" + "=" * 65)
+    print("[*] Fin de l'audit. Toolbox exécutée avec succès dans le temps imparti.")
 
 if __name__ == "__main__":
     main()
