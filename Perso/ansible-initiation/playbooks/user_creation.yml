@@ -16,3 +16,25 @@
         password: "{{ item.password }}"
         state: present
       loop: "{{ users }}"
+    
+    - name: Création des groupes pour les utilisateurs
+      ansible.builtin.group:
+        name: "{{ item.name }}_group"
+        state: present
+      loop: "{{ users }}"
+    
+    - name: Ajouter les utilisateurs aux groupes correspondants
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.name }}_group"
+        append: yes
+      loop: "{{ users }}"
+    
+    - name: Créer un répertoire pour chaque utilisateur
+      ansible.builtin.file:
+        path: "/home/{{ item.name }}"
+        state: directory
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0755'
+      loop: "{{ users }}"
