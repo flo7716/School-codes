@@ -30,11 +30,11 @@
         append: yes
       loop: "{{ users }}"
     
-    - name: Créer un répertoire pour chaque utilisateur
+    - name: Créer un répertoire pour chaque utilisateur (avec les permissions appropriées)
       ansible.builtin.file:
         path: "/home/{{ item.name }}"
         state: directory
         owner: "{{ item.name }}"
-        group: "{{ item.name }}"
+        group: "{{ item.name }}_group"
         mode: '0755'
       loop: "{{ users }}"
