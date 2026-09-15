@@ -15,7 +15,7 @@ int main(void){
             printf("Child process: a = %d\n", a);
             break;
         default:
-            a -= 5;
+            a += 100;
             printf("Parent process: a = %d\n", a);
             break;
     }
