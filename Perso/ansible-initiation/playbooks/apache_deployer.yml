@@ -1,15 +1,14 @@
-- name: Installer Apache et démarrer le service
+- name: Installer Apache sur un serveur Red-Hat et démarrer le service
   hosts: localhost
   become: true
   tasks:
     - name: Installer Apache
-      ansible.builtin.dnf:
+      ansible.builtin.yum:
         name: httpd
         state: present
-        update_cache: yes
 
     - name: Démarrer le service Apache
       ansible.builtin.service:
         name: httpd
         state: started
-        enabled: yes
+        enabled: true
