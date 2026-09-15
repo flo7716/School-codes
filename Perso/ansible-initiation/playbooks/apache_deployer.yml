@@ -3,13 +3,13 @@
   become: true
   tasks:
     - name: Installer Apache
-      ansible.builtin.apt:
-        name: apache2
+      ansible.builtin.dnf:
+        name: httpd
         state: present
         update_cache: yes
 
     - name: Démarrer le service Apache
       ansible.builtin.service:
-        name: apache2
+        name: httpd
         state: started
         enabled: yes
