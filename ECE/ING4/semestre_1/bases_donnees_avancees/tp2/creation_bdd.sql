@@ -1,3 +1,11 @@
+-- Florian ANDRE
+-- Ilana VARINOT
+-- Adel KHEYAR
+-- ING4 - Majeure cybersecurite en apprentissage 
+-- TP2 - Bases de données avancées
+
+
+
 -- Destruction des tables
 
 create database if not exists ECE_ING4;
