@@ -4,6 +4,8 @@
 -- ING4 - Majeure cybersecurite en apprentissage 
 -- TP2 - Bases de données avancées
 
+-- II - Interrogation
+
 use ECE_ING4;
 
 -- 1 : Vérifier la création des 4 tables et leur instanciation (nombre de lignes par table)

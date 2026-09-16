@@ -4,7 +4,7 @@
 -- ING4 - Majeure cybersecurite en apprentissage 
 -- TP2 - Bases de données avancées
 
-
+-- I - Création de la base de données et des tables
 
 -- Destruction des tables
 
