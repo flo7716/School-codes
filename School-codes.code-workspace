@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "techno_web_ece-1",
+			"path": "ECE/ING4/semestre_1/technos_web_avancees/techno_web_ece-1"
+		}
+	],
+	"settings": {
+		"python-envs.defaultEnvManager": "ms-python.python:conda",
+		"python-envs.defaultPackageManager": "ms-python.python:conda",
+		"snyk.advanced.organization": "f49556b9-fc07-420a-8195-1b49ddacb5a4"
+	}
+}
