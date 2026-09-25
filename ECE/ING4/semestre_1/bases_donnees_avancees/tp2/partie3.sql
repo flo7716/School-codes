@@ -1,5 +1,5 @@
 -- III
-use tp2;
+use ECE_ING4;
 -- 1 
 CREATE VIEW EtudLyonnais AS
 SELECT * FROM Etudiant WHERE Ville = 'Lyon';
