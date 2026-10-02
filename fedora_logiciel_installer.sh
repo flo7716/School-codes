@@ -10,6 +10,10 @@ sudo dnf update -y
 echo "Installing GNOME Tweaks and Extensions..."
 sudo dnf install gnome-tweaks gnome-extensions-app -y
 
+# Activate sysrq
+echo "Activating sysrq..."
+sudo sysctl -w kernel.sysrq=1
+
 # Install VS Code
 echo "Installing Visual Studio Code..."
 wget https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64 -O vscode.rpm
