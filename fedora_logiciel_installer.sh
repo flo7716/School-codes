@@ -6,6 +6,10 @@
 echo "Updating the system..."
 sudo dnf update -y
 
+# Install GNOME Tweaks and Extensions
+echo "Installing GNOME Tweaks and Extensions..."
+sudo dnf install gnome-tweaks gnome-extensions-app -y
+
 # Install VS Code
 echo "Installing Visual Studio Code..."
 wget https://code.visualstudio.com/sha/download?build=stable&os=linux-rpm-x64 -O vscode.rpm
