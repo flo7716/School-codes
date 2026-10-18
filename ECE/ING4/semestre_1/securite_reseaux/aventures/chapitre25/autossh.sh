@@ -2,12 +2,12 @@
 
 # Vérifier si l'IP est passée en argument
 if [ -z "$1" ]; then
-    echo "Usage: $0 <IP_SERVEUR>"
+    echo "Usage: $0 <IP_SERVEUR> [USER]"
     exit 1
 fi
 
-REMOTE_IP=$1
-REMOTE_USER="user" # Adaptez si besoin
+REMOTE_USER=$1
+REMOTE_IP=$2 # Adaptez si besoin
 
 # 1. Générer la clé automatiquement sans passphrase (-N "") et écraser l'ancienne si elle existe (-f)
 echo "[+] Génération de la paire de clés SSH..."
