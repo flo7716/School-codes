@@ -1,0 +1,9 @@
+#ignore all *.pem files in the current directory and all subdirectories
+*.pem
+*.bin
+*.srl
+*.asc
+*.docx
+
+#ignore all files in the tp_openvpn/ovpn_data directory of this repository
+tp_openvpn/ovpn_data/*

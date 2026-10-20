@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  ejbca:
+    image: keyfactor/ejbca-ce:latest
+    container_name: ejbca
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "4442:4442"
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - ejbca_data:/opt/keyfactor/ejbca-ce
+
+volumes:
+  ejbca_data:

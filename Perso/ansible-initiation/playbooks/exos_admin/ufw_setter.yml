@@ -1,0 +1,38 @@
+- name: Configuration du firewall UFW
+  hosts: localhost
+  become: true
+
+  vars:
+    ports_to_allow:
+      - 80
+      - 443
+
+  tasks:
+    - name: Autoriser le port 22 (SSH) avant activation de UFW
+      ansible.builtin.ufw:
+        rule: allow
+        port: 22
+        proto: tcp
+    - name: Autoriser les port 80 et 443 (HTTP et HTTPS) avant activation de UFW
+      ansible.builtin.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop: "{{ ports_to_allow }}"
+
+    - name: Définir la politique par défaut pour les connexions entrantes sur UFW
+      ansible.builtin.ufw:
+        state: enabled
+        policy: deny
+    - name: Définir la politique par défaut pour les connexions sortantes sur UFW
+      ansible.builtin.ufw:
+        state: enabled
+        policy: allow
+    - name: Autoriser le trafic sur l'interface docker0
+      ansible.builtin.ufw:
+        rule: allow
+        in_interface: docker0  
+    
+    - name: Activer UFW      
+      ansible.builtin.ufw:
+        state: enabled

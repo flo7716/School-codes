@@ -21,5 +21,14 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo systemctl status docker
 sudo systemctl start docker
 
+# Add user to docker group
+# Creates docker group if not existing
+if ! getent group docker > /dev/null; then
+  sudo groupadd docker
+fi
+
+sudo usermod -aG docker $USER
+newgrp docker #apply changes immediately (without logging off)
+
 # Verify if the installation is successful by running the hello-world image
-sudo docker run hello-world
+docker run hello-world

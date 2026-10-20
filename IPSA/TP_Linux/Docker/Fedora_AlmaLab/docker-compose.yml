@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  ipa:
+    image: freeipa/freeipa-server:rocky-9
+    container_name: ipa_server
+    hostname: ${IPA_HOSTNAME}
+    privileged: true
+    environment:
+      IPA_SERVER_HOSTNAME: ${IPA_HOSTNAME}
+      IPA_SERVER_DOMAIN: ${IPA_DOMAIN}
+      IPA_SERVER_REALM: ${IPA_REALM}
+      PASSWORD: ${IPA_ADMIN_PASSWORD}
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.10
+    command: >
+      ipa-server-install
+      --unattended
+      --realm=${IPA_REALM}
+      --domain=${IPA_DOMAIN}
+      --hostname=${IPA_HOSTNAME}
+      --ds-password=${IPA_DS_PASSWORD}
+      --admin-password=${IPA_ADMIN_PASSWORD}
+      --setup-dns
+      --no-client
+
+  almalinux_srv:
+    build: ./almalinux-server
+    container_name: almalinux_srv
+    hostname: srv.lab.local
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.11
+    extra_hosts:
+      - "ipa.lab.local:172.20.0.10"
+
+  client1:
+    build: ./fedora-client
+    container_name: fedora_client1
+    hostname: client1.lab.local
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.21
+    extra_hosts:
+      - "ipa.lab.local:172.20.0.10"
+
+  client2:
+    build: ./fedora-client
+    container_name: fedora_client2
+    hostname: client2.lab.local
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.22
+    extra_hosts:
+      - "ipa.lab.local:172.20.0.10"
+
+networks:
+  labnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

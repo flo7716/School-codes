@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for firewall
+firewall_allowed_in_ports:
+  - 22
+
+firewall_allowed_out_ports:
+  - 80
+  - 443
+  - 3306
