@@ -8,9 +8,9 @@
 #include <grp.h>
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage : %s <chemin_du_fichier> <nouveau_nom>\n", argv[0]);
-        return -1;
+    if (argc != 2) {
+        fprintf(stderr, "Usage : %s <chemin_du_fichier>\n", argv[0]);
+        exit(EXIT_FAILURE);
     }
 
     struct stat file_stat;
