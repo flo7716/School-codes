@@ -6,7 +6,7 @@
 /* Chasse aux zombies : ’appel waitpid(-1, NULL, WNOHANG) renvoie -1
 en cas d’erreur. Si il n’y a pas de fils zombie il renvoie immédiatement 0 (l’appel
 est non bloquant) et sinon un fils zombie est choisi, toutes ses ressources sont
-libérés et son pid est renvoyé. En déduire (et expérimenter) une maniére pour
+libérés et son pid est renvoyé. En déduire (et expérimenter) une manière pour
 un processus de se débarrasser de tous les zombies qu’il a créé. */
 
 int main() {
