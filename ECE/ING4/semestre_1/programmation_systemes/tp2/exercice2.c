@@ -38,8 +38,8 @@ int main() {
 
     // Le père attend la fin du deuxième fils
     wait(NULL);
-    
-    printf("\n");
+    printf("\n"); // Pour un affichage propre après les nombres
+    printf("Fin du programme\n");
 
     return 0;
 }
