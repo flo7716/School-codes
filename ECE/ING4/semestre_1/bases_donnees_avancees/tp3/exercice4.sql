@@ -30,15 +30,26 @@ birthday DATE,
 ssex VARCHAR2(10));
 
 BEGIN
-    INSERT INTO student VALUES( ‘01‘,‘Leon ‘ ,‘1990−02−01‘ ,‘M’ );
-    INSERT INTO student VALUES( ‘02‘, ‘David ‘,‘1990−12−21‘,‘M’ );
-    INSERT INTO student VALUES( ‘03‘,‘Lucas ‘,‘1990−12−20‘ ,‘M’ );
-    INSERT INTO student VALUES( ‘04‘,‘Paul ‘ ,‘1990−02−06‘ ,‘M’ );
-    INSERT INTO student VALUES( ‘05‘, ‘Lea ‘ ,‘1991−02−01‘ ,‘F’ );
-    INSERT INTO student VALUES( ‘06‘, ‘Sophie ‘,‘1992−03−01‘,‘F’ );
-    INSERT INTO student VALUES( ‘07‘, ‘ Ella ‘ ,‘1989−03−01‘ ,‘F’ );
-    INSERT INTO student VALUES( ‘08‘, ‘Zoe ‘ ,‘2007−12−20‘ ,‘F’ );
-    INSERT INTO student VALUES( ‘09‘, ‘Anais ‘,‘2007−12−25‘,‘F’ );
-    INSERT INTO student VALUES( ‘10‘, ‘Eva ‘,‘2002−06−06‘ ,‘F’ );
-    INSERT INTO student VALUES( ‘11‘, ‘Louise ‘,‘2003−06−13‘,‘F’ );
+    INSERT INTO student VALUES ('01', 'Leon',   TO_DATE('1990-02-01', 'YYYY-MM-DD'), 'M');
+    INSERT INTO student VALUES ('02', 'David',  TO_DATE('1990-12-21', 'YYYY-MM-DD'), 'M');
+    INSERT INTO student VALUES ('03', 'Lucas',  TO_DATE('1990-12-20', 'YYYY-MM-DD'), 'M');
+    INSERT INTO student VALUES ('04', 'Paul',   TO_DATE('1990-02-06', 'YYYY-MM-DD'), 'M');
+    INSERT INTO student VALUES ('05', 'Lea',    TO_DATE('1991-02-01', 'YYYY-MM-DD'), 'F');
+    INSERT INTO student VALUES ('06', 'Sophie', TO_DATE('1992-03-01', 'YYYY-MM-DD'), 'F');
+    INSERT INTO student VALUES ('07', 'Ella',   TO_DATE('1989-03-01', 'YYYY-MM-DD'), 'F');
+    INSERT INTO student VALUES ('08', 'Zoe',    TO_DATE('2007-12-20', 'YYYY-MM-DD'), 'F');
+    INSERT INTO student VALUES ('09', 'Anais',  TO_DATE('2007-12-25', 'YYYY-MM-DD'), 'F');
+    INSERT INTO student VALUES ('10', 'Eva',    TO_DATE('2002-06-06', 'YYYY-MM-DD'), 'F');
+    INSERT INTO student VALUES ('11', 'Louise', TO_DATE('2003-06-13', 'YYYY-MM-DD'), 'F');
+    
+    COMMIT; -- Permet de valider l'insertion dans la base de données
 END;
+/
+
+-- Ajout age
+ALTER TABLE student ADD age NUMBER;
+
+UPDATE student 
+SET age = calculer_age(birthday);
+
+SELECT * FROM student;
