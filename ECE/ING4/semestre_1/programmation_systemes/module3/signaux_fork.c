@@ -3,13 +3,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void trait_sigint(int sig) {
-    (void)sig;
-    printf("bien recu SIGINT, mais je vais l’ignorer\n");
+void trait_sigint (){ 
+    printf("bien recu SIGINT, mais je vais l’ignorer\n"); 
 }
-
-void trait_sigquit(int sig) {
-    (void)sig;
+void trait_sigquit (){ 
     printf("bien recu SIGQUIT, mais je vais l’ignorer\n");
 }
 
@@ -31,6 +28,6 @@ int main(){
         kill (pid , SIGQUIT);
         sleep (5);
         kill (pid,SIGKILL);
-        }
+        };
     return 0 ;
 }
