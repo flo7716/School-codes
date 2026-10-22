@@ -12,6 +12,7 @@ int main(void) {
         printf("Ne peut manipuler le signal\n");
         exit(1);
     }
+    printf("Mon pid : %d \n",getpid());
     while(1){
         fgets(buffer, sizeof(buffer), stdin);
         printf("Input: %s", buffer);
