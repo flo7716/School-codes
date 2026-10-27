@@ -34,6 +34,17 @@ df_reussite = get_data(f"""
 
 df_cc = get_data(f"SELECT sname, (cc1 + cc2) / 2.0 AS moyenne_cc, examen FROM {BASE} t", p)
 
+# ---- Requêtes avec JOINTURE : releve_de_notes (r) + etudiants (e), clé commune : sid ----
+JOIN = f"FROM {BASE} r JOIN etudiants e ON r.sid = e.sid"
+
+df_join = get_data(f"""
+    SELECT r.sname, e.filiere, e.sexe, r.cc1, r.cc2, r.examen, r.note_finale
+    {JOIN} ORDER BY r.note_finale DESC""", p)
+
+df_filiere = get_data(f"""
+    SELECT e.filiere, e.sexe, ROUND(AVG(r.note_finale), 2) AS moyenne, COUNT(*) AS effectif
+    {JOIN} GROUP BY e.filiere, e.sexe ORDER BY e.filiere, e.sexe""", p)
+
 # ---- Indicateurs ----
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Étudiants", len(df))
@@ -63,6 +74,11 @@ g4.plotly_chart(
                title="Contrôle continu vs examen"),
     width="stretch")
 
-# ---- Données brutes ----
-st.subheader("Données")
-st.dataframe(df, width="stretch")
+# ---- Jointure : notes + informations des étudiants ----
+st.subheader("Jointure : notes + filière + sexe")
+j1, j2 = st.columns(2)
+j1.plotly_chart(
+    px.bar(df_filiere, x="filiere", y="moyenne", color="sexe", barmode="group",
+           text="moyenne", title="Moyenne par filière et par sexe"),
+    width="stretch")
+j2.dataframe(df_join, width="stretch")
