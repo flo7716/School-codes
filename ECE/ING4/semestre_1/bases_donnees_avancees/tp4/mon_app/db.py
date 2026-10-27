@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text
 load_dotenv()
 
 # Par défaut : base SQLite dans le fichier notes.db (aucun serveur à installer)
-DB_URL = os.getenv("DB_URL", "sqlite:///notes.db")
+DB_URL = os.getenv("DB_URL")
 engine = create_engine(DB_URL)
 
 
