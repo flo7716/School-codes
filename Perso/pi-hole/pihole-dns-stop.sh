@@ -13,6 +13,9 @@ echo
 echo "Configuration DNS après restauration :"
 resolvectl status "$INTERFACE"
 
+# redémarrage du service systemd-resolved pour appliquer les changements
+sudo systemctl restart systemd-resolved
+
 echo
 read -r -p "Arrêter le conteneur Pi-hole ? [o/N] " answer
 
