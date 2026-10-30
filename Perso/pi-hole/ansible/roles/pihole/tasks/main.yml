@@ -1,0 +1,51 @@
+---
+- name: Vérifier que Docker Desktop est accessible
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - info
+  changed_when: false
+
+- name: Vérifier la présence du fichier Compose
+  ansible.builtin.stat:
+    path: "{{ pihole_project_dir }}/docker-compose.yml"
+  register: compose_file
+
+- name: Refuser de continuer si Compose est absent
+  ansible.builtin.assert:
+    that:
+      - compose_file.stat.exists
+    fail_msg: "Le fichier docker-compose.yml est introuvable."
+
+- name: Démarrer Pi-hole avec Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ pihole_project_dir }}"
+    project_name: pihole
+    state: present
+  register: pihole_compose
+
+- name: Attendre que le DNS Pi-hole réponde
+  ansible.builtin.command:
+    argv:
+      - dig
+      - +time=2
+      - +tries=1
+      - "@{{ pihole_dns_address }}"
+      - -p
+      - "{{ pihole_dns_port | string }}"
+      - example.com
+      - A
+      - +short
+  register: pihole_dns_test
+  changed_when: false
+  retries: 15
+  delay: 2
+  until:
+    - pihole_dns_test.rc == 0
+    - pihole_dns_test.stdout | trim | length > 0
+
+- name: Confirmer le fonctionnement de Pi-hole
+  ansible.builtin.debug:
+    msg: "Pi-hole fonctionne. DNS disponible sur {{ pihole_dns_address }}:{{ pihole_dns_port }}."
