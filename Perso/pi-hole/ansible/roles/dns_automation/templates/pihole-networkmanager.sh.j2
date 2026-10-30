@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -u
+
+INTERFACE="{{ pihole_interface }}"
+ACTION="${2:-}"
+PIHOLE_USER="{{ pihole_user }}"
+PIHOLE_HOME="{{ pihole_home }}"
+CONTAINER="{{ pihole_container }}"
+DNS="{{ pihole_dns_address }}"
+PORT="{{ pihole_dns_port }}"
+CONTEXT="{{ docker_context }}"
+
+# Éviter les exécutions concurrentes
+exec 9>/run/lock/pihole-networkmanager.lock
+flock -n 9 || exit 0
+
+# Ne gérer que l'interface Wi-Fi configurée
+[[ "$1" == "$INTERFACE" ]] || exit 0
+
+# Restaurer le DNS réseau à la déconnexion
+if [[ "$ACTION" == "down" || "$ACTION" == "pre-down" ]]; then
+    resolvectl revert "$INTERFACE"
+    logger -t pihole-networkmanager "DNS réseau restauré sur $INTERFACE"
+    exit 0
+fi
+
+# Traiter uniquement les événements utiles
+[[ "$ACTION" == "up" || "$ACTION" == "dhcp4-change" ]] || exit 0
+
+PIHOLE_UID=$(id -u "$PIHOLE_USER")
+RUNTIME_DIR="/run/user/$PIHOLE_UID"
+
+docker_cmd() {
+    runuser -u "$PIHOLE_USER" -- \
+        env HOME="$PIHOLE_HOME" \
+            XDG_RUNTIME_DIR="$RUNTIME_DIR" \
+        /usr/bin/docker --context "$CONTEXT" "$@"
+}
+
+logger -t pihole-networkmanager "Vérification de Docker Desktop"
+
+DOCKER_READY=false
+
+for i in {1..60}; do
+    if docker_cmd info >/dev/null 2>&1; then
+        DOCKER_READY=true
+        break
+    fi
+    sleep 2
+done
+
+if [[ "$DOCKER_READY" != "true" ]]; then
+    logger -t pihole-networkmanager "Docker indisponible : restauration du DNS réseau"
+    resolvectl revert "$INTERFACE"
+    exit 0
+fi
+
+RUNNING=$(docker_cmd inspect \
+    -f '{{ "{{" }}.State.Running{{ "}}" }}' \
+    "$CONTAINER" 2>/dev/null || true)
+
+if [[ "$RUNNING" != "true" ]]; then
+    logger -t pihole-networkmanager "Démarrage de Pi-hole"
+
+    if ! docker_cmd start "$CONTAINER" >/dev/null; then
+        logger -t pihole-networkmanager "Impossible de démarrer Pi-hole"
+        resolvectl revert "$INTERFACE"
+        exit 0
+    fi
+fi
+
+DNS_READY=false
+
+for i in {1..30}; do
+    if dig +time=2 +tries=1 @"$DNS" -p "$PORT" example.com A +short |
+        grep -qE '^[0-9]+\.'; then
+        DNS_READY=true
+        break
+    fi
+    sleep 2
+done
+
+if [[ "$DNS_READY" != "true" ]]; then
+    logger -t pihole-networkmanager "Pi-hole ne répond pas : restauration du DNS réseau"
+    resolvectl revert "$INTERFACE"
+    exit 0
+fi
+
+resolvectl dns "$INTERFACE" "$DNS:$PORT"
+
+logger -t pihole-networkmanager "DNS Pi-hole appliqué sur $INTERFACE"

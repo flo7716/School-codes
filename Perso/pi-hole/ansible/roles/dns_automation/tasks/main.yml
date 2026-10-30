@@ -1,0 +1,40 @@
+---
+- name: Installer les outils DNS nécessaires
+  become: true
+  ansible.builtin.dnf:
+    name: bind-utils
+    state: present
+
+- name: Déployer le script de gestion DNS
+  become: true
+  ansible.builtin.template:
+    src: pihole-networkmanager.sh.j2
+    dest: /usr/local/sbin/pihole-networkmanager.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Déployer le dispatcher NetworkManager
+  become: true
+  ansible.builtin.template:
+    src: 90-pihole-dns.j2
+    dest: /etc/NetworkManager/dispatcher.d/90-pihole-dns
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Activer le service NetworkManager Dispatcher
+  become: true
+  ansible.builtin.systemd_service:
+    name: NetworkManager-dispatcher.service
+    enabled: true
+    state: started
+
+- name: Appliquer immédiatement la configuration DNS Pi-hole
+  become: true
+  ansible.builtin.command:
+    argv:
+      - /usr/local/sbin/pihole-networkmanager.sh
+      - "{{ pihole_interface }}"
+      - up
+  changed_when: false

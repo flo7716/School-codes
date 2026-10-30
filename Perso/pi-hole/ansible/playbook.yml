@@ -27,3 +27,9 @@
   roles:
     - role: pihole
       when: pihole_action in ['install', 'enable']
+
+    - role: dns_automation
+      when: pihole_action in ['install', 'enable']
+
+    - role: cleanup
+      when: pihole_action in ['disable', 'uninstall']

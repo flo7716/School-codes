@@ -1,0 +1,80 @@
+---
+- name: Vérifier l'action de nettoyage
+  ansible.builtin.assert:
+    that:
+      - pihole_action in ['disable', 'uninstall']
+    fail_msg: "Le rôle cleanup ne gère que disable et uninstall."
+
+- name: Vérifier que la suppression des données est autorisée
+  ansible.builtin.assert:
+    that:
+      - pihole_action == 'uninstall'
+    fail_msg: "La suppression des données est réservée à uninstall."
+  when: pihole_erase_data | bool
+
+- name: Supprimer le dispatcher NetworkManager
+  become: true
+  ansible.builtin.file:
+    path: /etc/NetworkManager/dispatcher.d/90-pihole-dns
+    state: absent
+
+- name: Supprimer le script de gestion DNS
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/sbin/pihole-networkmanager.sh
+    state: absent
+
+- name: Restaurer le DNS fourni par le réseau
+  become: true
+  ansible.builtin.command:
+    argv:
+      - resolvectl
+      - revert
+      - "{{ pihole_interface }}"
+  changed_when: true
+
+- name: Arrêter Pi-hole pour disable
+  become: true
+  become_user: "{{ pihole_user }}"
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - stop
+      - "{{ pihole_container }}"
+  environment:
+    HOME: "{{ pihole_home }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
+  register: pihole_stop
+  changed_when: pihole_stop.rc == 0
+  failed_when: pihole_stop.rc != 0 and 'No such container' not in pihole_stop.stderr
+  when: pihole_action == 'disable'
+
+- name: Supprimer le déploiement Compose pour uninstall
+  become: true
+  become_user: "{{ pihole_user }}"
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - compose
+      - down
+  args:
+    chdir: "{{ pihole_project_dir }}"
+  environment:
+    HOME: "{{ pihole_home }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ lookup('ansible.builtin.pipe', 'id -u ' ~ pihole_user) }}"
+  register: pihole_down
+  changed_when: "'Removed' in pihole_down.stdout or 'Stopped' in pihole_down.stdout"
+  when: pihole_action == 'uninstall'
+
+- name: Supprimer les données persistantes Pi-hole
+  become: true
+  ansible.builtin.file:
+    path: "{{ pihole_project_dir }}/etc-pihole"
+    state: absent
+  when:
+    - pihole_action == 'uninstall'
+    - pihole_erase_data | bool

@@ -1,6 +1,7 @@
 ---
 # Utilisateur et environnement
 pihole_user: florianandre
+pihole_uid: 1000
 pihole_home: /home/florianandre
 pihole_project_dir: /home/florianandre/Documents/School-codes/Perso/pi-hole
 
