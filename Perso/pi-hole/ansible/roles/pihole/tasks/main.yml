@@ -34,7 +34,6 @@
     HOME: "{{ pihole_home }}"
     XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
   register: pihole_existing
-  failed_when: false
 
 - name: Vérifier que le conteneur existant est sain
   ansible.builtin.assert:
