@@ -34,6 +34,7 @@
   become: true
   ansible.builtin.command:
     argv:
+      - /usr/bin/bash
       - /usr/local/sbin/pihole-networkmanager.sh
       - "{{ pihole_interface }}"
       - up
