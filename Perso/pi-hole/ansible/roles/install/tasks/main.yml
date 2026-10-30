@@ -1,0 +1,67 @@
+---
+- name: Vérifier que Docker est installé
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --version
+  changed_when: false
+
+- name: Vérifier que Docker Compose est disponible
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - version
+  changed_when: false
+
+- name: Vérifier que le fichier Compose existe
+  ansible.builtin.stat:
+    path: "{{ docker_compose_file }}"
+  register: compose_file
+
+- name: Arrêter si le fichier Compose est absent
+  ansible.builtin.assert:
+    that:
+      - compose_file.stat.exists
+      - compose_file.stat.isreg
+    fail_msg: "Le fichier docker-compose.yml est introuvable."
+
+- name: Télécharger l'image Pi-hole
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - compose
+      - -f
+      - "{{ docker_compose_file }}"
+      - pull
+
+- name: Démarrer Pi-hole
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - compose
+      - -f
+      - "{{ docker_compose_file }}"
+      - up
+      - -d
+
+- name: Vérifier les conteneurs actifs
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - compose
+      - -f
+      - "{{ docker_compose_file }}"
+      - ps
+  register: pihole_status
+  changed_when: false
+
+- name: Afficher le résultat
+  ansible.builtin.debug:
+    var: pihole_status.stdout_lines

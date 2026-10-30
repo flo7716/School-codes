@@ -1,27 +1,45 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-CONTEXT="desktop-linux"
-CONTAINER="pihole"
-INTERFACE="wlo1"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+COMPOSE_FILE="$PROJECT_DIR/docker-compose.yml"
 
-echo "=== Restauration du DNS Fedora ==="
+[[ $EUID -eq 0 ]] || {
+    echo "[ERREUR] Exécute ce script avec sudo." >&2
+    exit 1
+}
 
-sudo resolvectl revert "$INTERFACE"
+[[ -f "$COMPOSE_FILE" ]] || {
+    echo "[ERREUR] Fichier Compose introuvable : $COMPOSE_FILE" >&2
+    exit 1
+}
 
-echo
-echo "Configuration DNS après restauration :"
-resolvectl status "$INTERFACE"
+echo "[Pi-hole] Arrêt du conteneur..."
 
-# redémarrage du service systemd-resolved pour appliquer les changements
-sudo systemctl restart systemd-resolved
+stop_status=0
 
-echo
-read -r -p "Arrêter le conteneur Pi-hole ? [o/N] " answer
+docker --context default compose \
+    --project-directory "$PROJECT_DIR" \
+    -f "$COMPOSE_FILE" \
+    stop pihole || stop_status=$?
 
-if [[ "$answer" =~ ^[oOyY]$ ]]; then
-    docker --context "$CONTEXT" stop "$CONTAINER"
-    echo "Pi-hole arrêté."
-else
-    echo "Pi-hole reste démarré ; le DNS Fedora est restauré."
+echo "[Pi-hole] Restauration du DNS réseau..."
+
+restore_status=0
+
+"$SCRIPT_DIR/pihole-dns-restore.sh" || restore_status=$?
+
+if (( stop_status != 0 )); then
+    echo "[ERREUR] L'arrêt de Pi-hole a échoué." >&2
 fi
+
+if (( restore_status != 0 )); then
+    echo "[ERREUR] La restauration DNS a échoué." >&2
+fi
+
+if (( stop_status != 0 || restore_status != 0 )); then
+    exit 1
+fi
+
+echo "[Pi-hole] Arrêt terminé. DNS réseau restauré."

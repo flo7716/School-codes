@@ -1,97 +1,82 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 
-set -u
+ACTION="${1:-}"
 
-INTERFACE="$1"
-ACTION="$2"
-
-PIHOLE_USER="florianandre"
-PIHOLE_HOME="/home/florianandre"
-CONTAINER="pihole"
-DNS="127.0.0.1"
-PORT="54"
-
-# Ne traiter que notre interface Wi-Fi
-[[ "$INTERFACE" == "wlo1" ]] || exit 0
-
-# Lors d'une déconnexion, retirer la configuration DNS temporaire
-if [[ "$ACTION" == "down" || "$ACTION" == "pre-down" ]]; then
-    resolvectl revert "$INTERFACE"
-    exit 0
-fi
-
-# Événements intéressants
-[[ "$ACTION" == "up" || "$ACTION" == "dhcp4-change" ]] || exit 0
-
-PIHOLE_UID=$(id -u "$PIHOLE_USER")
-RUNTIME_DIR="/run/user/$PIHOLE_UID"
-
-# Exécuter Docker avec l'identité de l'utilisateur
-docker_cmd() {
-    runuser -u "$PIHOLE_USER" -- \
-        env HOME="$PIHOLE_HOME" \
-            XDG_RUNTIME_DIR="$RUNTIME_DIR" \
-        /usr/bin/docker --context desktop-linux "$@"
+log() {
+    echo "[Pi-hole NetworkManager] $*"
 }
 
-logger -t pihole-networkmanager \
-    "Connexion Wi-Fi détectée : attente de Docker Desktop"
+die() {
+    echo "[ERREUR] $*" >&2
+    exit 1
+}
 
-# Attendre Docker Desktop (maximum 120 secondes)
-DOCKER_READY=false
+[[ $EUID -eq 0 ]] || die "Exécute ce script avec sudo."
 
-for i in {1..60}; do
-    if docker_cmd info >/dev/null 2>&1; then
-        DOCKER_READY=true
-        break
+command -v ip >/dev/null 2>&1 || die "La commande ip est introuvable."
+command -v nmcli >/dev/null 2>&1 || die "NetworkManager (nmcli) est introuvable."
+command -v resolvectl >/dev/null 2>&1 || die "systemd-resolved (resolvectl) est introuvable."
+
+detect_interface() {
+    local interface
+
+    interface=$(
+        ip -4 route get 1.1.1.1 2>/dev/null |
+        awk '{for (i=1; i<=NF; i++) if ($i == "dev") {print $(i+1); exit}}'
+    )
+
+    if [[ -z "$interface" ]]; then
+        interface=$(
+            ip -6 route get 2606:4700:4700::1111 2>/dev/null |
+            awk '{for (i=1; i<=NF; i++) if ($i == "dev") {print $(i+1); exit}}'
+        )
     fi
-    sleep 2
-done
 
-if [[ "$DOCKER_READY" != "true" ]]; then
-    logger -t pihole-networkmanager \
-        "Docker Desktop indisponible : restauration du DNS réseau"
-    resolvectl revert "$INTERFACE"
-    exit 0
-fi
+    [[ -n "$interface" ]] || die "Impossible de détecter l'interface réseau active."
+    printf '%s\n' "$interface"
+}
 
-# Démarrer Pi-hole si nécessaire
-RUNNING=$(docker_cmd inspect \
-    -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null || true)
+get_connection() {
+    local interface="$1"
+    local connection
 
-if [[ "$RUNNING" != "true" ]]; then
-    logger -t pihole-networkmanager "Démarrage de Pi-hole"
+    connection=$(nmcli -g GENERAL.CONNECTION device show "$interface" | head -n 1)
 
-    if ! docker_cmd start "$CONTAINER" >/dev/null; then
-        logger -t pihole-networkmanager \
-            "Impossible de démarrer Pi-hole"
-        resolvectl revert "$INTERFACE"
-        exit 0
-    fi
-fi
+    [[ -n "$connection" && "$connection" != "--" ]] ||
+        die "Aucun profil NetworkManager actif pour $interface."
 
-# Vérifier que le DNS Pi-hole répond
-DNS_READY=false
+    printf '%s\n' "$connection"
+}
 
-for i in {1..30}; do
-    if dig +time=2 +tries=1 \
-        @"$DNS" -p "$PORT" example.com A +short |
-        grep -qE '^[0-9]+\.'; then
-        DNS_READY=true
-        break
-    fi
-    sleep 2
-done
+INTERFACE=$(detect_interface)
+CONNECTION=$(get_connection "$INTERFACE")
 
-if [[ "$DNS_READY" != "true" ]]; then
-    logger -t pihole-networkmanager \
-        "Pi-hole ne répond pas : restauration du DNS réseau"
-    resolvectl revert "$INTERFACE"
-    exit 0
-fi
+log "Interface détectée : $INTERFACE"
+log "Profil actif : $CONNECTION"
 
-# Appliquer Pi-hole sans redémarrer systemd-resolved
-resolvectl dns "$INTERFACE" "$DNS:$PORT"
+case "$ACTION" in
+    enable)
+        log "Configuration de Pi-hole comme DNS..."
 
-logger -t pihole-networkmanager \
-    "DNS Pi-hole appliqué sur $INTERFACE"
+        resolvectl dns "$INTERFACE" 127.0.0.1
+        resolvectl default-route "$INTERFACE" yes
+        resolvectl flush-caches
+
+        log "DNS Pi-hole appliqué sur $INTERFACE."
+        ;;
+
+    restore)
+        log "Restauration du DNS via NetworkManager..."
+
+        nmcli connection up "$CONNECTION" ifname "$INTERFACE"
+        resolvectl flush-caches
+
+        log "Profil réseau réactivé : $CONNECTION"
+        log "Configuration DNS restaurée."
+        ;;
+
+    *)
+        die "Action invalide. Utilisation : $0 {enable|restore}"
+        ;;
+esac

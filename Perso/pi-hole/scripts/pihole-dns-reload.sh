@@ -1,61 +1,53 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-CONTEXT="desktop-linux"
-CONTAINER="pihole"
-INTERFACE="wlo1"
-DNS="127.0.0.1"
-PORT="54"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+COMPOSE_FILE="$PROJECT_DIR/docker-compose.yml"
+CONTAINER_NAME="pihole"
+MAX_ATTEMPTS=30
 
-echo "=== Recharge DNS Pi-hole ==="
+log() {
+    echo "[Pi-hole] $*"
+}
 
-# Vérifier Docker Desktop
-if ! docker --context "$CONTEXT" info >/dev/null 2>&1; then
-    echo "ERREUR : Docker Desktop n'est pas disponible."
+die() {
+    echo "[ERREUR] $*" >&2
     exit 1
-fi
+}
 
-# Démarrer Pi-hole si nécessaire
-RUNNING=$(docker --context "$CONTEXT" inspect \
-    -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null || true)
+[[ $EUID -eq 0 ]] || die "Exécute ce script avec sudo."
+command -v docker >/dev/null 2>&1 || die "Docker est introuvable."
+command -v dig >/dev/null 2>&1 || die "dig est introuvable. Installe bind-utils."
 
-if [[ "$RUNNING" != "true" ]]; then
-    echo "Démarrage du conteneur Pi-hole..."
-    docker --context "$CONTEXT" start "$CONTAINER" >/dev/null
-fi
+[[ -f "$COMPOSE_FILE" ]] || die "Fichier Compose introuvable : $COMPOSE_FILE"
 
-# Attendre que le DNS réponde
-echo "Vérification du DNS..."
-READY=false
+log "Démarrage de Pi-hole..."
 
-for i in {1..15}; do
-    if dig +time=2 +tries=1 \
-        @"$DNS" -p "$PORT" example.com A \
-        +short | grep -qE '^[0-9]+\.'; then
-        READY=true
+docker --context default compose \
+    --project-directory "$PROJECT_DIR" \
+    -f "$COMPOSE_FILE" \
+    up -d pihole
+
+log "Attente de la disponibilité DNS..."
+
+for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
+    if docker --context default inspect "$CONTAINER_NAME" \
+        --format '{{.State.Running}}' 2>/dev/null | grep -qx true &&
+       dig +time=2 +tries=1 +short @127.0.0.1 example.com | grep -q .; then
+        log "Pi-hole répond correctement sur 127.0.0.1:53."
         break
     fi
+
+    if (( attempt == MAX_ATTEMPTS )); then
+        die "Pi-hole n'a pas répondu après $MAX_ATTEMPTS tentatives."
+    fi
+
     sleep 2
 done
 
-if [[ "$READY" != "true" ]]; then
-    echo "ERREUR : Pi-hole ne répond pas correctement."
-    echo "Le DNS Fedora n'a pas été modifié."
-    exit 1
-fi
+log "Activation de Pi-hole comme DNS système..."
 
-# Appliquer le DNS Pi-hole à l'interface Wi-Fi
-sudo resolvectl dns "$INTERFACE" "$DNS:$PORT"
+"$SCRIPT_DIR/pihole-networkmanager.sh" enable
 
-
-# Ne pas redémarrer systemd-resolved :
-# cela effacerait la configuration DNS temporaire.
-
-
-echo
-echo "=== DNS configuré ==="
-resolvectl status "$INTERFACE"
-
-echo
-echo "Test de résolution système :"
-resolvectl query example.com
+log "Pi-hole est opérationnel."

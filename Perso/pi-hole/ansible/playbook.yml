@@ -1,0 +1,25 @@
+---
+- name: Gestion de Pi-hole
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+
+  vars:
+    valid_actions:
+      - install
+      - enable
+      - disable
+      - uninstall
+
+  tasks:
+    - name: Vérifier l'action demandée
+      ansible.builtin.assert:
+        that:
+          - pihole_action is defined
+          - pihole_action in valid_actions
+        fail_msg: "Action invalide. Utilisez install, enable, disable ou uninstall."
+
+    - name: Exécuter le rôle demandé
+      ansible.builtin.include_role:
+        name: "{{ pihole_action }}"
