@@ -27,8 +27,6 @@
   ansible.builtin.command:
     argv:
       - nmcli
-      - --escape
-      - no
       - -g
       - IP4.DNS
       - device
@@ -36,7 +34,20 @@
       - "{{ pihole_interface }}"
   register: wifi_dns
   changed_when: false
-  when: pihole_action == 'disable'
+  when: pihole_action in ['disable', 'uninstall']
+
+- name: Vérifier que NetworkManager a fourni au moins un DNS IPv4
+  ansible.builtin.assert:
+    that:
+      - wifi_dns_servers | length > 0
+    fail_msg: "Aucun serveur DNS IPv4 n'a été récupéré. Pi-hole ne sera pas arrêté."
+  when: pihole_action in ['disable', 'uninstall']
+
+- name: Extraire les adresses DNS IPv4
+  ansible.builtin.set_fact:
+    wifi_dns_servers: >-
+      {{ wifi_dns.stdout | regex_findall('[0-9]{1,3}(?:\.[0-9]{1,3}){3}') }}
+  when: pihole_action in ['disable', 'uninstall']
 
 - name: Vérifier que des DNS DHCP sont disponibles
   ansible.builtin.assert:
