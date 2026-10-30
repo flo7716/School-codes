@@ -98,31 +98,6 @@
       Les DNS Wi-Fi ne répondent pas correctement.
       Pi-hole ne sera pas arrêté.
 
-# ============================================================
-# RESTAURATION DU DNS RÉSEAU
-# ============================================================
-
-- name: Restaurer le DNS fourni par le réseau
-  become: true
-  ansible.builtin.command:
-    argv:
-      - resolvectl
-      - revert
-      - "{{ pihole_interface }}"
-  register: dns_revert
-  changed_when: dns_revert.rc == 0
-
-- name: Vérifier que la résolution DNS système fonctionne
-  ansible.builtin.command:
-    argv:
-      - resolvectl
-      - query
-      - example.com
-  register: system_dns_test
-  changed_when: false
-  retries: 5
-  delay: 2
-  until: system_dns_test.rc == 0
 
 # ============================================================
 # DISABLE : ARRÊTER LE CONTENEUR SANS LE SUPPRIMER
