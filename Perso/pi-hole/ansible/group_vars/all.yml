@@ -1,18 +1,19 @@
 ---
-# Docker
+# Docker natif
 docker_context: default
-docker_compose_file: "{{ playbook_dir }}/../docker-compose.yml"
+
+# Projet
+pihole_project_dir: "{{ playbook_dir }}/.."
+docker_compose_file: "{{ pihole_project_dir }}/docker-compose.yml"
+
+# Scripts
+pihole_scripts_dir: "{{ pihole_project_dir }}/scripts"
 
 # Pi-hole
 pihole_container_name: pihole
-pihole_image: pihole/pihole:latest
-
-# Répertoires
-pihole_project_dir: "{{ playbook_dir }}/../"
 pihole_data_dir: "{{ pihole_project_dir }}/etc-pihole"
 
 # Réseau
-pihole_interface: wlo1
 pihole_dns_address: 127.0.0.1
-pihole_dns_port: 54
+pihole_dns_port: 53
 pihole_web_port: 8081

@@ -1,0 +1,58 @@
+---
+- name: Vérifier le fichier Compose
+  ansible.builtin.stat:
+    path: "{{ docker_compose_file }}"
+  register: uninstall_compose
+
+- name: Vérifier le fichier Compose
+  ansible.builtin.assert:
+    that:
+      - uninstall_compose.stat.exists
+      - uninstall_compose.stat.isreg
+    fail_msg: "Impossible de désinstaller : docker-compose.yml est introuvable."
+
+- name: Vérifier le script d'arrêt et de restauration DNS
+  ansible.builtin.stat:
+    path: "{{ pihole_scripts_dir }}/pihole-dns-stop.sh"
+  register: uninstall_script
+
+- name: Vérifier la présence du script
+  ansible.builtin.assert:
+    that:
+      - uninstall_script.stat.exists
+      - uninstall_script.stat.isreg
+    fail_msg: "Le script de restauration DNS est introuvable."
+
+- name: Arrêter Pi-hole et restaurer le DNS
+  ansible.builtin.command:
+    argv:
+      - "{{ pihole_scripts_dir }}/pihole-dns-stop.sh"
+  register: uninstall_stop
+
+- name: Supprimer les conteneurs et réseaux Compose
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - compose
+      - -f
+      - "{{ docker_compose_file }}"
+      - down
+      - --remove-orphans
+  register: uninstall_down
+  changed_when: >
+    'Removed' in uninstall_down.stdout or
+    'Removing' in uninstall_down.stdout
+
+- name: Confirmer la conservation des données
+  ansible.builtin.stat:
+    path: "{{ pihole_data_dir }}"
+  register: retained_data
+
+- name: Afficher le résultat
+  ansible.builtin.debug:
+    msg:
+      - "Pi-hole a été désinstallé."
+      - "Données persistantes conservées : {{ retained_data.stat.exists }}"
+      - "Répertoire : {{ pihole_data_dir }}"

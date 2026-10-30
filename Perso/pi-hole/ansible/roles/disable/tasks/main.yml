@@ -1,0 +1,22 @@
+---
+- name: Vérifier le script d'arrêt
+  ansible.builtin.stat:
+    path: "{{ pihole_scripts_dir }}/pihole-dns-stop.sh"
+  register: disable_script
+
+- name: Vérifier la présence du script
+  ansible.builtin.assert:
+    that:
+      - disable_script.stat.exists
+      - disable_script.stat.isreg
+    fail_msg: "Le script pihole-dns-stop.sh est introuvable."
+
+- name: Arrêter Pi-hole et restaurer le DNS
+  ansible.builtin.command:
+    argv:
+      - "{{ pihole_scripts_dir }}/pihole-dns-stop.sh"
+  register: disable_result
+
+- name: Afficher le résultat
+  ansible.builtin.debug:
+    var: disable_result.stdout_lines

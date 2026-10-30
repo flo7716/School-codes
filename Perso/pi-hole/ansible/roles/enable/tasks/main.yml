@@ -1,0 +1,22 @@
+---
+- name: Vérifier le script d'activation DNS
+  ansible.builtin.stat:
+    path: "{{ pihole_scripts_dir }}/pihole-dns-reload.sh"
+  register: enable_script
+
+- name: Vérifier la présence du script
+  ansible.builtin.assert:
+    that:
+      - enable_script.stat.exists
+      - enable_script.stat.isreg
+    fail_msg: "Le script pihole-dns-reload.sh est introuvable."
+
+- name: Activer Pi-hole comme DNS système
+  ansible.builtin.command:
+    argv:
+      - "{{ pihole_scripts_dir }}/pihole-dns-reload.sh"
+  register: enable_result
+
+- name: Afficher le résultat
+  ansible.builtin.debug:
+    var: enable_result.stdout_lines
