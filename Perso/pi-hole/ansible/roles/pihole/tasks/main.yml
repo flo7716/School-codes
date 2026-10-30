@@ -24,17 +24,40 @@
       - compose_file.stat.exists
     fail_msg: "Le fichier docker-compose.yml est introuvable."
 
-- name: Démarrer Pi-hole avec Docker Compose
+- name: Inspecter le conteneur Pi-hole existant
+  become: true
+  become_user: "{{ pihole_user }}"
+  community.docker.docker_container_info:
+    name: "{{ pihole_container }}"
+    docker_host: "unix://{{ pihole_home }}/.docker/desktop/docker.sock"
+  environment:
+    HOME: "{{ pihole_home }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
+  register: pihole_existing
+  failed_when: false
+
+- name: Vérifier que le conteneur existant est sain
+  ansible.builtin.assert:
+    that:
+      - pihole_existing.exists
+      - pihole_existing.container.State.Running
+      - pihole_existing.container.State.Health.Status == "healthy"
+    fail_msg: >-
+      Le conteneur Pi-hole existe mais n'est pas sain.
+      Aucune recréation automatique ne sera effectuée.
+  when: pihole_existing.exists
+
+- name: Déployer Pi-hole si le conteneur est absent
   become: true
   become_user: "{{ pihole_user }}"
   community.docker.docker_compose_v2:
     project_src: "{{ pihole_project_dir }}"
-    project_name: pihole
+    project_name: pi-hole
     state: present
   environment:
     HOME: "{{ pihole_home }}"
     XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
-  register: pihole_compose
+  when: not pihole_existing.exists
 
 - name: Attendre que le DNS Pi-hole réponde
   ansible.builtin.command:
@@ -58,4 +81,6 @@
 
 - name: Confirmer le fonctionnement de Pi-hole
   ansible.builtin.debug:
-    msg: "Pi-hole fonctionne. DNS disponible sur {{ pihole_dns_address }}:{{ pihole_dns_port }}."
+    msg: >-
+      Pi-hole fonctionne.
+      DNS disponible sur {{ pihole_dns_address }}:{{ pihole_dns_port }}.
