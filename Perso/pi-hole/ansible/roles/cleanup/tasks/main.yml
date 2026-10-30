@@ -27,6 +27,8 @@
   ansible.builtin.command:
     argv:
       - nmcli
+      - --escape
+      - no
       - -g
       - IP4.DNS
       - device
@@ -53,7 +55,7 @@
       - example.com
       - A
       - +short
-  loop: "{{ wifi_dns.stdout_lines | select('match', '.+') | list }}"
+  loop: "{{ wifi_dns.stdout | trim | split(',') | map('trim') | select('match', '.+') | list }}"
   register: wifi_dns_tests
   changed_when: false
   failed_when: false
