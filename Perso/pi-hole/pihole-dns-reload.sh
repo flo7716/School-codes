@@ -47,8 +47,10 @@ fi
 # Appliquer le DNS Pi-hole à l'interface Wi-Fi
 sudo resolvectl dns "$INTERFACE" "$DNS:$PORT"
 
-# redémarrage du service systemd-resolved pour appliquer les changements
-sudo systemctl restart systemd-resolved
+
+# Ne pas redémarrer systemd-resolved :
+# cela effacerait la configuration DNS temporaire.
+
 
 echo
 echo "=== DNS configuré ==="
