@@ -52,6 +52,7 @@
   community.docker.docker_compose_v2:
     project_src: "{{ pihole_project_dir }}"
     project_name: pi-hole
+    cli_context: "{{ docker_context }}"
     state: present
   environment:
     HOME: "{{ pihole_home }}"
