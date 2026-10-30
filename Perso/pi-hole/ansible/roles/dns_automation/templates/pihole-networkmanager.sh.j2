@@ -1,5 +1,6 @@
+
 #!/usr/bin/env bash
-set -u
+set -uo pipefail
 
 INTERFACE="{{ pihole_interface }}"
 ACTION="${2:-}"
@@ -10,24 +11,34 @@ DNS="{{ pihole_dns_address }}"
 PORT="{{ pihole_dns_port }}"
 CONTEXT="{{ docker_context }}"
 
+# Ne gérer que l'interface configurée
+[[ "${1:-}" == "$INTERFACE" ]] || exit 0
+
 # Éviter les exécutions concurrentes
 exec 9>/run/lock/pihole-networkmanager.lock
-flock -n 9 || exit 0
+if ! flock -w 30 9; then
+    logger -t pihole-networkmanager "Impossible d'obtenir le verrou réseau"
+    exit 1
+fi
 
-# Ne gérer que l'interface Wi-Fi configurée
-[[ "$1" == "$INTERFACE" ]] || exit 0
+restore_network_dns() {
+    if resolvectl revert "$INTERFACE"; then
+        logger -t pihole-networkmanager "DNS réseau restauré sur $INTERFACE"
+    else
+        logger -t pihole-networkmanager "ERREUR : restauration DNS impossible sur $INTERFACE"
+    fi
+}
 
-# Restaurer le DNS réseau à la déconnexion
+# Déconnexion ou arrêt de l'interface
 if [[ "$ACTION" == "down" || "$ACTION" == "pre-down" ]]; then
-    resolvectl revert "$INTERFACE"
-    logger -t pihole-networkmanager "DNS réseau restauré sur $INTERFACE"
+    restore_network_dns
     exit 0
 fi
 
-# Traiter uniquement les événements utiles
+# Événements pris en charge
 [[ "$ACTION" == "up" || "$ACTION" == "dhcp4-change" ]] || exit 0
 
-PIHOLE_UID=$(id -u "$PIHOLE_USER")
+PIHOLE_UID=$(id -u "$PIHOLE_USER") || exit 1
 RUNTIME_DIR="/run/user/$PIHOLE_UID"
 
 docker_cmd() {
@@ -39,6 +50,7 @@ docker_cmd() {
 
 logger -t pihole-networkmanager "Vérification de Docker Desktop"
 
+# Attendre que Docker Desktop soit disponible
 DOCKER_READY=false
 
 for i in {1..60}; do
@@ -50,11 +62,12 @@ for i in {1..60}; do
 done
 
 if [[ "$DOCKER_READY" != "true" ]]; then
-    logger -t pihole-networkmanager "Docker indisponible : restauration du DNS réseau"
-    resolvectl revert "$INTERFACE"
+    logger -t pihole-networkmanager "Docker indisponible"
+    restore_network_dns
     exit 0
 fi
 
+# Vérifier l'état du conteneur
 RUNNING=$(docker_cmd inspect \
     -f '{{ "{{" }}.State.Running{{ "}}" }}' \
     "$CONTAINER" 2>/dev/null || true)
@@ -64,11 +77,12 @@ if [[ "$RUNNING" != "true" ]]; then
 
     if ! docker_cmd start "$CONTAINER" >/dev/null; then
         logger -t pihole-networkmanager "Impossible de démarrer Pi-hole"
-        resolvectl revert "$INTERFACE"
+        restore_network_dns
         exit 0
     fi
 fi
 
+# Attendre une réponse DNS valide
 DNS_READY=false
 
 for i in {1..30}; do
@@ -81,11 +95,16 @@ for i in {1..30}; do
 done
 
 if [[ "$DNS_READY" != "true" ]]; then
-    logger -t pihole-networkmanager "Pi-hole ne répond pas : restauration du DNS réseau"
-    resolvectl revert "$INTERFACE"
+    logger -t pihole-networkmanager "Pi-hole ne répond pas"
+    restore_network_dns
     exit 0
 fi
 
-resolvectl dns "$INTERFACE" "$DNS:$PORT"
-
-logger -t pihole-networkmanager "DNS Pi-hole appliqué sur $INTERFACE"
+# Appliquer le DNS Pi-hole uniquement après validation
+if resolvectl dns "$INTERFACE" "$DNS:$PORT"; then
+    logger -t pihole-networkmanager "DNS Pi-hole appliqué sur $INTERFACE"
+else
+    logger -t pihole-networkmanager "Échec d'application du DNS Pi-hole"
+    restore_network_dns
+    exit 1
+fi

@@ -1,11 +1,16 @@
 ---
 - name: Vérifier que Docker Desktop est accessible
+  become: true
+  become_user: "{{ pihole_user }}"
   ansible.builtin.command:
     argv:
       - docker
       - --context
       - "{{ docker_context }}"
       - info
+  environment:
+    HOME: "{{ pihole_home }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
   changed_when: false
 
 - name: Vérifier la présence du fichier Compose
@@ -20,10 +25,15 @@
     fail_msg: "Le fichier docker-compose.yml est introuvable."
 
 - name: Démarrer Pi-hole avec Docker Compose
+  become: true
+  become_user: "{{ pihole_user }}"
   community.docker.docker_compose_v2:
     project_src: "{{ pihole_project_dir }}"
     project_name: pihole
     state: present
+  environment:
+    HOME: "{{ pihole_home }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
   register: pihole_compose
 
 - name: Attendre que le DNS Pi-hole réponde
