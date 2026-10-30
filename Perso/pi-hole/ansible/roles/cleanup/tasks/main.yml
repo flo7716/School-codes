@@ -1,4 +1,3 @@
-
 ---
 - name: Vérifier l'action de nettoyage
   ansible.builtin.assert:
@@ -12,7 +11,64 @@
       - not (pihole_erase_data | bool)
     fail_msg: "La suppression des données persistantes n'est pas autorisée par cette automatisation."
 
+# DISABLE : empêcher le dispatcher de redémarrer Pi-hole
+- name: Marquer Pi-hole comme volontairement désactivé
+  become: true
+  ansible.builtin.file:
+    path: /var/lib/pihole-automation/disabled
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+  when: pihole_action == 'disable'
+
+# Vérifier les DNS fournis par le réseau
+- name: Récupérer les DNS fournis par NetworkManager
+  ansible.builtin.command:
+    argv:
+      - nmcli
+      - -g
+      - IP4.DNS
+      - device
+      - show
+      - "{{ pihole_interface }}"
+  register: wifi_dns
+  changed_when: false
+  when: pihole_action == 'disable'
+
+- name: Vérifier que des DNS DHCP sont disponibles
+  ansible.builtin.assert:
+    that:
+      - wifi_dns.stdout_lines | select('match', '.+') | list | length > 0
+    fail_msg: "Aucun serveur DNS fourni par le réseau Wi-Fi."
+  when: pihole_action == 'disable'
+
+- name: Tester les DNS du réseau Wi-Fi
+  ansible.builtin.command:
+    argv:
+      - dig
+      - +time=2
+      - +tries=1
+      - "@{{ item }}"
+      - example.com
+      - A
+      - +short
+  loop: "{{ wifi_dns.stdout_lines | select('match', '.+') | list }}"
+  register: wifi_dns_tests
+  changed_when: false
+  failed_when: false
+  when: pihole_action == 'disable'
+
+- name: Vérifier qu'au moins un DNS Wi-Fi fonctionne
+  ansible.builtin.assert:
+    that:
+      - wifi_dns_tests.results | selectattr('rc', 'equalto', 0) | list | length > 0
+    fail_msg: "Les DNS Wi-Fi ne répondent pas. Pi-hole ne sera pas arrêté."
+  when: pihole_action == 'disable'
+
+# Restaurer le DNS réseau
 - name: Restaurer le DNS fourni par le réseau
+  become: true
   ansible.builtin.command:
     argv:
       - resolvectl
@@ -20,16 +76,7 @@
       - "{{ pihole_interface }}"
   changed_when: true
 
-- name: Supprimer le dispatcher NetworkManager
-  ansible.builtin.file:
-    path: /etc/NetworkManager/dispatcher.d/90-pihole-dns
-    state: absent
-
-- name: Supprimer le script de gestion DNS
-  ansible.builtin.file:
-    path: /usr/local/sbin/pihole-networkmanager.sh
-    state: absent
-
+# DISABLE : arrêter le conteneur sans le supprimer
 - name: Arrêter Pi-hole pour disable
   become: true
   become_user: "{{ pihole_user }}"
@@ -48,6 +95,7 @@
   failed_when: pihole_stop.rc != 0 and 'No such container' not in pihole_stop.stderr
   when: pihole_action == 'disable'
 
+# UNINSTALL : supprimer le déploiement
 - name: Supprimer le déploiement Compose pour uninstall
   become: true
   become_user: "{{ pihole_user }}"
@@ -65,4 +113,26 @@
     XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
   register: pihole_down
   changed_when: "'Removed' in pihole_down.stdout or 'Stopped' in pihole_down.stdout"
+  when: pihole_action == 'uninstall'
+
+# UNINSTALL uniquement : supprimer les scripts et le dispatcher
+- name: Supprimer le dispatcher NetworkManager
+  become: true
+  ansible.builtin.file:
+    path: /etc/NetworkManager/dispatcher.d/90-pihole-dns
+    state: absent
+  when: pihole_action == 'uninstall'
+
+- name: Supprimer le script de gestion DNS
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/sbin/pihole-networkmanager.sh
+    state: absent
+  when: pihole_action == 'uninstall'
+
+- name: Supprimer le marqueur de désactivation
+  become: true
+  ansible.builtin.file:
+    path: /var/lib/pihole-automation/disabled
+    state: absent
   when: pihole_action == 'uninstall'

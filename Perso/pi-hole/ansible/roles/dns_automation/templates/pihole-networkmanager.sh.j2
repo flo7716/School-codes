@@ -1,45 +1,78 @@
+```bash
 #!/usr/bin/env bash
 set -uo pipefail
 
+# Configuration Ansible
 INTERFACE="{{ pihole_interface }}"
 ACTION="${2:-}"
+
 PIHOLE_USER="{{ pihole_user }}"
 PIHOLE_HOME="{{ pihole_home }}"
 CONTAINER="{{ pihole_container }}"
+
 DNS="{{ pihole_dns_address }}"
 PORT="{{ pihole_dns_port }}"
 CONTEXT="{{ docker_context }}"
+
+# Gestion de l'état
+STATE_DIR="/var/lib/pihole-automation"
+DISABLED_FLAG="$STATE_DIR/disabled"
 
 # Ne gérer que l'interface configurée
 [[ "${1:-}" == "$INTERFACE" ]] || exit 0
 
 # Éviter les exécutions concurrentes
 exec 9>/run/lock/pihole-networkmanager.lock
+
 if ! flock -w 30 9; then
-    logger -t pihole-networkmanager "Impossible d'obtenir le verrou réseau"
+    logger -t pihole-networkmanager \
+        "Impossible d'obtenir le verrou réseau"
     exit 1
 fi
 
+# Restaurer les DNS fournis par NetworkManager
 restore_network_dns() {
     if resolvectl revert "$INTERFACE"; then
-        logger -t pihole-networkmanager "DNS réseau restauré sur $INTERFACE"
+        logger -t pihole-networkmanager \
+            "DNS réseau restauré sur $INTERFACE"
+        return 0
     else
-        logger -t pihole-networkmanager "ERREUR : restauration DNS impossible sur $INTERFACE"
+        logger -t pihole-networkmanager \
+            "ERREUR : restauration DNS impossible sur $INTERFACE"
+        return 1
     fi
 }
 
 # Déconnexion ou arrêt de l'interface
 if [[ "$ACTION" == "down" || "$ACTION" == "pre-down" ]]; then
     restore_network_dns
-    exit 0
+    exit $?
 fi
 
 # Événements pris en charge
-[[ "$ACTION" == "up" || "$ACTION" == "dhcp4-change" ]] || exit 0
+if [[ "$ACTION" != "up" && "$ACTION" != "dhcp4-change" ]]; then
+    exit 0
+fi
 
-PIHOLE_UID=$(id -u "$PIHOLE_USER") || exit 1
+# Ne pas redémarrer Pi-hole s'il a été volontairement désactivé
+if [[ -f "$DISABLED_FLAG" ]]; then
+    logger -t pihole-networkmanager \
+        "Pi-hole volontairement désactivé : conservation du DNS réseau"
+    restore_network_dns
+    exit $?
+fi
+
+# Identité de l'utilisateur Docker
+PIHOLE_UID=$(id -u "$PIHOLE_USER") || {
+    logger -t pihole-networkmanager \
+        "Utilisateur Pi-hole introuvable"
+    restore_network_dns
+    exit 1
+}
+
 RUNTIME_DIR="/run/user/$PIHOLE_UID"
 
+# Commandes Docker exécutées avec le compte utilisateur
 docker_cmd() {
     runuser -u "$PIHOLE_USER" -- \
         env HOME="$PIHOLE_HOME" \
@@ -47,7 +80,8 @@ docker_cmd() {
         /usr/bin/docker --context "$CONTEXT" "$@"
 }
 
-logger -t pihole-networkmanager "Vérification de Docker Desktop"
+logger -t pihole-networkmanager \
+    "Vérification de la disponibilité de Docker Desktop"
 
 # Attendre que Docker Desktop soit disponible
 DOCKER_READY=false
@@ -61,49 +95,61 @@ for i in {1..60}; do
 done
 
 if [[ "$DOCKER_READY" != "true" ]]; then
-    logger -t pihole-networkmanager "Docker indisponible"
+    logger -t pihole-networkmanager \
+        "Docker indisponible : conservation du DNS réseau"
     restore_network_dns
     exit 0
 fi
 
-# Vérifier l'état du conteneur
+# Vérifier l'état du conteneur Pi-hole
 RUNNING=$(docker_cmd inspect \
     -f '{{ "{{" }}.State.Running{{ "}}" }}' \
     "$CONTAINER" 2>/dev/null || true)
 
 if [[ "$RUNNING" != "true" ]]; then
-    logger -t pihole-networkmanager "Démarrage de Pi-hole"
+    logger -t pihole-networkmanager \
+        "Démarrage du conteneur Pi-hole"
 
     if ! docker_cmd start "$CONTAINER" >/dev/null; then
-        logger -t pihole-networkmanager "Impossible de démarrer Pi-hole"
+        logger -t pihole-networkmanager \
+            "Impossible de démarrer Pi-hole"
         restore_network_dns
         exit 0
     fi
 fi
 
-# Attendre une réponse DNS valide
+# Attendre une réponse DNS valide de Pi-hole
 DNS_READY=false
 
 for i in {1..30}; do
-    if dig +time=2 +tries=1 @"$DNS" -p "$PORT" example.com A +short |
+    if dig +time=2 +tries=1 \
+        @"$DNS" -p "$PORT" example.com A +short |
         grep -qE '^[0-9]+\.'; then
+
         DNS_READY=true
         break
     fi
+
     sleep 2
 done
 
 if [[ "$DNS_READY" != "true" ]]; then
-    logger -t pihole-networkmanager "Pi-hole ne répond pas"
+    logger -t pihole-networkmanager \
+        "Pi-hole ne répond pas aux requêtes DNS"
     restore_network_dns
     exit 0
 fi
 
 # Appliquer le DNS Pi-hole uniquement après validation
 if resolvectl dns "$INTERFACE" "$DNS:$PORT"; then
-    logger -t pihole-networkmanager "DNS Pi-hole appliqué sur $INTERFACE"
+    logger -t pihole-networkmanager \
+        "DNS Pi-hole appliqué sur $INTERFACE"
 else
-    logger -t pihole-networkmanager "Échec d'application du DNS Pi-hole"
+    logger -t pihole-networkmanager \
+        "Échec d'application du DNS Pi-hole"
     restore_network_dns
     exit 1
 fi
+
+exit 0
+```

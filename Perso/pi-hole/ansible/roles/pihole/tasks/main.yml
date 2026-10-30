@@ -35,6 +35,23 @@
     XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
   register: pihole_existing
 
+- name: Démarrer Pi-hole s'il existe mais est arrêté
+  become: true
+  become_user: "{{ pihole_user }}"
+  ansible.builtin.command:
+    argv:
+      - docker
+      - --context
+      - "{{ docker_context }}"
+      - start
+      - "{{ pihole_container }}"
+  environment:
+    HOME: "{{ pihole_home }}"
+    XDG_RUNTIME_DIR: "/run/user/{{ pihole_uid }}"
+  when:
+    - pihole_existing.exists
+    - not pihole_existing.container.State.Running
+
 - name: Vérifier que le conteneur existant est sain
   ansible.builtin.assert:
     that:
