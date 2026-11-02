@@ -1,0 +1,17 @@
+# Règles pédagogiques pour le CTF "Le Chemin de la Glace".
+# Chaque règle correspond à une ligne du tableau "Détection de l'attaque" de la documentation.
+
+# 1. Scan de ports / reconnaissance (nmap) : nombreuses nouvelles connexions depuis la même IP
+alert tcp any any -> $HOME_NET any (msg:"CTF - Possible scan de ports (taux de connexion eleve)"; flags:S; threshold: type threshold, track by_src, count 10, seconds 5; classtype:attempted-recon; sid:1000001; rev:1;)
+
+# 2. FTP anonyme : connexion sans mot de passe
+alert tcp any any -> $HOME_NET 21 (msg:"CTF - Connexion FTP anonyme detectee"; content:"USER anonymous"; nocase; classtype:policy-violation; sid:1000002; rev:1;)
+
+# 3. FTP : téléchargement du fichier de sauvegarde sensible
+alert tcp any any -> $HOME_NET 21 (msg:"CTF - Telechargement du fichier de sauvegarde sensible via FTP"; content:"RETR"; nocase; content:"config.php.bak"; distance:0; classtype:successful-recon-limited; sid:1000003; rev:1;)
+
+# 4. HTTP : signature d'injection SQL sur recherche.php
+alert http any any -> $HOME_NET 80 (msg:"CTF - Tentative d injection SQL sur recherche.php"; flow:to_server; http.uri; content:"recherche.php"; nocase; pcre:"/UNION.{1,30}SELECT|information_schema|--[\s%]|%27.{0,10}(OR|UNION)/i"; classtype:web-application-attack; sid:1000004; rev:1;)
+
+# 5. HTTP : scan de répertoires/fichiers (gobuster, dirb...) via un fort taux de 404
+alert http any any -> $HOME_NET 80 (msg:"CTF - Possible scan de repertoires (gobuster/dirb)"; flow:to_client; http.stat_code; content:"404"; threshold: type threshold, track by_src, count 15, seconds 10; classtype:web-application-attack; sid:1000005; rev:1;)

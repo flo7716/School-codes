@@ -1,0 +1,133 @@
+name: glace
+
+x-hardened: &hardened
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+networks:
+  dmz:                      # seule zone joignable depuis Internet (ports 80 et 21)
+    driver: bridge
+    ipam:
+      config: [{ subnet: 10.0.10.0/24 }]
+  lan:                      # zone interne : uniquement srv-web <-> srv-db
+    driver: bridge
+    internal: true
+    ipam:
+      config: [{ subnet: 10.0.20.0/24 }]
+  admin:                    # zone interne : collecte de logs centralisée
+    driver: bridge
+    internal: true
+    ipam:
+      config: [{ subnet: 10.0.30.0/24 }]
+
+volumes:
+  db_data:
+  logs_data:
+
+services:
+  # ========================= DMZ =========================
+  ftp:
+    <<: *hardened
+    build: ./ftp
+    container_name: srv-ftp
+    hostname: srv-ftp
+    environment:
+      PASV_ADDRESS: ${PASV_ADDRESS:-127.0.0.1}   # IP/hôte annoncée en mode passif (cf. README)
+    ports:
+      - "21:21"
+      - "21100-21110:21100-21110"   # plage PASV du service FTP (cf. README §limites)
+    networks:
+      dmz:   { ipv4_address: 10.0.10.20 }
+      admin: { ipv4_address: 10.0.30.20 }   # expédition des logs vers srv-logs uniquement
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE, DAC_OVERRIDE]
+
+  web:
+    <<: *hardened
+    build: ./web
+    container_name: srv-web
+    hostname: srv-web
+    environment:
+      DB_HOST: 10.0.20.10
+      DB_NAME: glace_db
+      DB_USER: glace_app
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "80:80"
+    networks:
+      dmz:   { ipv4_address: 10.0.10.10 }
+      lan:   { ipv4_address: 10.0.20.10 }     # NB : .10 côté lan = seul flux autorisé vers srv-db
+      admin: { ipv4_address: 10.0.30.10 }
+    depends_on:
+      db: { condition: service_healthy }
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE, DAC_OVERRIDE]
+
+  # IDS en coupure sur l'interface réseau de srv-ftp et srv-web (netns partagé =
+  # visibilité réelle du trafic reçu par chaque machine DMZ, cf. README §IDS)
+  ids-ftp:
+    <<: *hardened
+    build: ./ids
+    container_name: ids-ftp
+    network_mode: "service:ftp"
+    depends_on: [ftp]
+    cap_add: [NET_ADMIN, NET_RAW, SYS_NICE]
+    volumes:
+      - ./ids/custom.rules:/etc/suricata/rules/custom.rules:ro
+      - ./ids/suricata.yaml:/etc/suricata/suricata.yaml:ro
+    environment:
+      LOG_HOST: 10.0.30.100
+      IDS_NAME: ids-ftp
+    command: ["suricata", "-c", "/etc/suricata/suricata.yaml", "--af-packet=eth0"]
+
+  ids-web:
+    <<: *hardened
+    build: ./ids
+    container_name: ids-web
+    network_mode: "service:web"
+    depends_on: [web]
+    cap_add: [NET_ADMIN, NET_RAW, SYS_NICE]
+    volumes:
+      - ./ids/custom.rules:/etc/suricata/rules/custom.rules:ro
+      - ./ids/suricata.yaml:/etc/suricata/suricata.yaml:ro
+    environment:
+      LOG_HOST: 10.0.30.100
+      IDS_NAME: ids-web
+    command: ["suricata", "-c", "/etc/suricata/suricata.yaml", "--af-packet=eth0"]
+
+  # ========================= LAN =========================
+  db:
+    <<: *hardened
+    image: mysql:8.4
+    container_name: srv-db
+    hostname: srv-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: glace_db
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      lan: { ipv4_address: 10.0.20.10 }
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE]
+
+  # ========================= ADMIN =========================
+  logs:
+    <<: *hardened
+    build: ./logs
+    container_name: srv-logs
+    hostname: srv-logs
+    volumes:
+      - logs_data:/var/log/remote
+    networks:
+      admin: { ipv4_address: 10.0.30.100 }
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, NET_ADMIN]

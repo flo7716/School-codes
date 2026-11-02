@@ -1,0 +1,9 @@
+<?php
+// Sauvegarde du 12/09 avant migration - A SUPPRIMER
+// flag{ftp_4n0nym0us_l34k}
+$db_host = "10.0.20.10";
+$db_name = "glace_db";
+$db_user = "glace_app";
+$db_pass = "Gl4c3_App_2026";
+// TODO : recherche.php n'utilise pas encore de requête préparée
+// TODO : déplacer la table secrets hors de glace_db

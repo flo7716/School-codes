@@ -1,0 +1,30 @@
+[DEFAULT]
+backend = polling
+bantime = 1h
+findtime = 10m
+maxretry = 5
+action = %(action_)s
+
+[web-login-bruteforce]
+enabled = true
+filter  = web-login-bruteforce
+logpath = /var/log/remote/srv-web/apache-error.log
+port    = http
+maxretry = 5
+findtime = 2m
+
+[web-sqli-attempt]
+enabled = true
+filter  = web-sqli-attempt
+logpath = /var/log/remote/srv-web/apache-access.log
+port    = http
+maxretry = 1
+findtime = 10m
+
+[ftp-anonymous-recon]
+enabled = true
+filter  = ftp-anonymous-recon
+logpath = /var/log/remote/srv-ftp/vsftpd.log
+port    = ftp
+maxretry = 3
+findtime = 5m
