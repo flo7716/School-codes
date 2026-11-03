@@ -24,7 +24,9 @@ int main(int argc, char *argv[])
     {
         /*2*/
         // Code du fils
-        for (int i=0; i<10; i++); // simule un petit calcul[cite: 3]
+        for (int i=0; i<10; i++){
+           printf("Fils : %d\n", i); 
+        }; // simule un petit calcul[cite: 3]
         /*3*/
         exit(1);
     }
