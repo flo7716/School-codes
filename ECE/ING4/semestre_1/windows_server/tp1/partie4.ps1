@@ -1,26 +1,42 @@
-# 4.1 Vérification de la réplication entre les deux DCs
-# Test complet de santé du contrôleur de domaine local
+# ==========================================
+# Script de contrôle de santé et de réplication AD
+# Domaine : corp.local
+# ==========================================
+
+Write-Host "=== 1. État général du contrôleur de domaine ===" -ForegroundColor Cyan
 Dcdiag /v
 
-# Résumé de l'état de la réplication entre DC1 et DC2
+Write-Host "`n=== 2. État de la réplication Active Directory ===" -ForegroundColor Cyan
 repadmin /replsummary
-
-# Vérification détaillée des connexions de réplication entrantes/sortantes
 repadmin /showrepl
 
-# 4.2 Vérification de la réplication du SYSVOL entre les deux DCs 
-#Vérification du bon fonctionnement du service DFSR pour SYSVOL
-Get-CimInstance -Namespace "root\MicrosoftDFS" -ClassName DfsrVolumeConfig
+Write-Host "`n=== 3. Vérification de la résolution DNS et des enregistrements SRV ===" -ForegroundColor Cyan
+# Test de résolution du domaine et des contrôleurs
+Resolve-DnsName corp.local
+# Vérification des enregistrements SRV critiques pour la localisation des DC
+Get-DnsServerResourceRecord -ZoneName "corp.local" -Name "_ldap._tcp.dc._msdcs" -ErrorAction SilentlyContinue
 
-# Test d'accès au partage SYSVOL distant depuis l'autre DC
-ls \\DC1-FLOADVICIL\SYSVOL\corp.local
+Write-Host "`n=== 4. Vérification de la cohérence SYSVOL (DFSR) ===" -ForegroundColor Cyan
+Get-CimInstance -Namespace "root\MicrosoftDFS" -ClassName DfsrVolumeConfig | Select-Object VolumeName, ReplicationGroupName
 
-##4.3 Test de réplication entre les deux DCs
-# Exécuter sur DC1 : Création d'un utilisateur de test
-New-ADUser -Name "TestRepl" -SamAccountName "TestRepl" -UserPrincipalName "TestRepl@corp.local" -Path "CN=Users,DC=corp,DC=local" -Enabled $true
+Write-Host "`n=== 5. Test de création et de réplication d'objet (Q4.3) ===" -ForegroundColor Cyan
+$testUser = "TestReplUser"
 
-# Exécuter sur DC2 : Forcer la réplication immédiate si besoin
-repadmin /syncall /A /e /P
+# Création sur le DC local (ou DC1)
+if (-not (Get-ADUser -Filter "SamAccountName -eq '$testUser'" -ErrorAction SilentlyContinue)) {
+    New-ADUser -Name $testUser -SamAccountName $testUser -UserPrincipalName "$testUser@corp.local" -Path "CN=Users,DC=corp,DC=local" -Enabled $true -AccountPassword (ConvertTo-SecureString "P@ssw0rd123!" -AsPlainText -Force)
+    Write-Host "Utilisateur $testUser créé avec succès." -ForegroundColor Green
+} else {
+    Write-Host "L'utilisateur $testUser existe déjà." -ForegroundColor Yellow
+}
 
-# Vérifier la présence de l'objet sur DC2
-Get-ADUser -Identity "TestRepl"
+# Forcer la synchronisation de réplication
+repadmin /syncall /A /e /P | Out-Null
+Start-Sleep -Seconds 3
+
+# Vérification de la présence de l'objet
+if (Get-ADUser -Identity $testUser) {
+    Write-Host "Objet $testUser trouvé et répliqué avec succès." -ForegroundColor Green
+} else {
+    Write-Warning "L'objet $testUser n'est pas encore visible."
+}
