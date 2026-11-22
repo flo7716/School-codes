@@ -1,0 +1,249 @@
+# =============================================================================
+#  Homelab — labo de test (routeur, bastion, Pi-hole, Nextcloud)
+#  Reproduit l'architecture cible du M920x avec des conteneurs.
+#
+#  Réseaux :
+#    wan      172.31.0.0/24   seul réseau avec accès Internet (via l'hôte)
+#    lan      10.10.10.0/24   services (Pi-hole, Nextcloud, client de test)
+#    admin    10.10.20.0/24   administration (bastion)
+#    backend  10.10.30.0/24   bases de données — non routé, Nextcloud seulement
+#
+#  Seul point d'entrée : 127.0.0.1:2222 -> routeur -> DNAT -> bastion:22
+# =============================================================================
+
+name: homelab
+
+# Conteneur "passerelle" : partage le namespace réseau d'un service et y pose
+# la route par défaut vers le routeur. Le service lui-même reste sans NET_ADMIN.
+x-gw-sidecar: &gw-sidecar
+  image: alpine:3.22
+  init: true
+  restart: unless-stopped
+  cap_add: [NET_ADMIN]
+  command:
+    - sh
+    - -c
+    - ip route replace default via "$$GW" && echo "route par défaut -> $$GW" && exec sleep infinity
+
+services:
+
+  # ---------------------------------------------------------------- routeur --
+  router:
+    build: ./router
+    container_name: lab-router
+    hostname: router
+    init: true
+    restart: unless-stopped
+    cap_add: [NET_ADMIN]
+    sysctls:
+      net.ipv4.ip_forward: "1"
+    environment:
+      WAN_IP: 172.31.0.254
+      WAN_GW: 172.31.0.1
+      LAN_IP: 10.10.10.254
+      ADMIN_IP: 10.10.20.254
+      LAN_NET: 10.10.10.0/24
+      ADMIN_NET: 10.10.20.0/24
+      BASTION_IP: 10.10.20.10
+      PROXY_IP: 10.10.10.30
+      SSH_DNAT_PORT: "2222"
+    ports:
+      - "127.0.0.1:${SSH_PUBLIC_PORT:-2222}:2222"        # admin : SSH -> bastion
+      - "127.0.0.1:${HTTPS_PUBLIC_PORT:-443}:443"        # utilisateurs : HTTPS -> reverse proxy
+    networks:
+      wan:
+        ipv4_address: 172.31.0.254
+        # Indispensable : sans ça, Docker peut envoyer les ports publiés
+        # (2222, 443) vers l'IP du routeur sur "admin" au lieu du WAN.
+        gw_priority: 100
+      lan:
+        ipv4_address: 10.10.10.254
+      admin:
+        ipv4_address: 10.10.20.254
+
+  # ---------------------------------------------------------------- bastion --
+  bastion:
+    build: ./bastion
+    container_name: lab-bastion
+    hostname: bastion
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./secrets/lab_ed25519.pub:/run/authorized_keys:ro
+      - bastion-hostkeys:/etc/ssh/hostkeys
+    networks:
+      admin:
+        ipv4_address: 10.10.20.10
+    depends_on: [router]
+
+  bastion-gw:
+    <<: *gw-sidecar
+    container_name: lab-bastion-gw
+    environment: { GW: 10.10.20.254 }
+    network_mode: "service:bastion"
+    depends_on: [bastion]
+
+  # ---------------------------------------------------------------- pi-hole --
+  pihole:
+    image: pihole/pihole:latest   # à figer sur une version précise ensuite
+    container_name: lab-pihole
+    hostname: pihole
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+      FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD:?lancer ./deploy.sh}
+      FTLCONF_dns_upstreams: "9.9.9.9;149.112.112.112"
+      FTLCONF_dns_listeningMode: all
+    dns: [9.9.9.9, 149.112.112.112]   # résolveurs publics (le LAN n'atteint pas les IP privées)
+    volumes:
+      - pihole-etc:/etc/pihole
+    networks:
+      lan:
+        ipv4_address: 10.10.10.10
+    depends_on: [router]
+
+  pihole-gw:
+    <<: *gw-sidecar
+    container_name: lab-pihole-gw
+    environment: { GW: 10.10.10.254 }
+    network_mode: "service:pihole"
+    depends_on: [pihole]
+
+  # -------------------------------------------------------------- nextcloud --
+  nextcloud-db:
+    image: mariadb:11.4
+    container_name: lab-nextcloud-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?lancer ./deploy.sh}
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:?lancer ./deploy.sh}
+    volumes:
+      - nextcloud-db:/var/lib/mysql
+    networks:
+      backend:
+        ipv4_address: 10.10.30.10
+
+  nextcloud-redis:
+    image: redis:7-alpine
+    container_name: lab-nextcloud-redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?lancer ./deploy.sh}"]
+    networks: [backend]
+
+  nextcloud:
+    image: nextcloud:stable-apache   # à figer sur une version précise ensuite
+    container_name: lab-nextcloud
+    hostname: nextcloud
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: nextcloud-db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: nextcloud-redis
+      REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
+      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER:-admin}
+      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD:?lancer ./deploy.sh}
+      NEXTCLOUD_TRUSTED_DOMAINS: "${NEXTCLOUD_DOMAIN:-nextcloud.localhost} 10.10.10.20"
+      # Derrière le reverse proxy HTTPS (relus à chaque démarrage)
+      TRUSTED_PROXIES: 10.10.10.30
+      OVERWRITEPROTOCOL: https
+      OVERWRITECLIURL: https://${NEXTCLOUD_DOMAIN:-nextcloud.localhost}
+    dns: [10.10.10.10]              # Nextcloud passe par Pi-hole
+    volumes:
+      - nextcloud-data:/var/www/html
+    networks:
+      lan:
+        ipv4_address: 10.10.10.20
+      backend: {}
+    depends_on: [nextcloud-db, nextcloud-redis, router]
+
+  nextcloud-gw:
+    <<: *gw-sidecar
+    container_name: lab-nextcloud-gw
+    environment: { GW: 10.10.10.254 }
+    network_mode: "service:nextcloud"
+    depends_on: [nextcloud]
+
+  # ---------------------------------------------- reverse proxy HTTPS --
+  # Point d'entrée utilisateurs : https://nextcloud.localhost
+  # Certificat signé par l'autorité interne de Caddy (./deploy.sh trust-ca)
+  proxy:
+    image: caddy:2-alpine
+    container_name: lab-proxy
+    hostname: proxy
+    restart: unless-stopped
+    environment:
+      NEXTCLOUD_DOMAIN: ${NEXTCLOUD_DOMAIN:-nextcloud.localhost}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data          # conserve l'autorité de certification
+      - caddy-config:/config
+    networks:
+      lan:
+        ipv4_address: 10.10.10.30
+    depends_on: [nextcloud, router]
+
+  proxy-gw:
+    <<: *gw-sidecar
+    container_name: lab-proxy-gw
+    environment: { GW: 10.10.10.254 }
+    network_mode: "service:proxy"
+    depends_on: [proxy]
+
+  # ------------------------------------------------- client LAN (tests) --
+  lan-client:
+    image: alpine:3.22
+    container_name: lab-lan-client
+    hostname: lan-client
+    init: true
+    restart: unless-stopped
+    cap_add: [NET_ADMIN]
+    dns: [10.10.10.10]          # résolution via Pi-hole
+    command:
+      - sh
+      - -c
+      - >
+        ip route replace default via 10.10.10.254;
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+        apk add --no-cache bind-tools curl netcat-openbsd >/dev/null 2>&1 && echo "outils installés" && break;
+        echo "apk : pas d'accès Internet (essai $$i)"; sleep 5;
+        done;
+        exec sleep infinity
+    networks:
+      lan:
+        ipv4_address: 10.10.10.100
+    depends_on: [router, pihole]
+
+# =============================================================================
+networks:
+  wan:
+    ipam:
+      config: [{ subnet: 172.31.0.0/24, gateway: 172.31.0.1 }]
+  # lan et admin ne sont PAS "internal" : sur un réseau internal, Docker ajoute
+  # sur l'hôte des règles qui jettent tout paquet dont la source ou la
+  # destination sort du sous-réseau — y compris le trafic routé par notre
+  # routeur (NAT sortant, DNAT entrant). L'isolation est assurée par les
+  # routes par défaut (*-gw -> routeur) et par le pare-feu du routeur.
+  lan:
+    ipam:
+      config: [{ subnet: 10.10.10.0/24, gateway: 10.10.10.1 }]
+  admin:
+    ipam:
+      config: [{ subnet: 10.10.20.0/24, gateway: 10.10.20.1 }]
+  backend:
+    internal: true
+    ipam:
+      config: [{ subnet: 10.10.30.0/24, gateway: 10.10.30.1 }]
+
+volumes:
+  bastion-hostkeys:
+  pihole-etc:
+  nextcloud-db:
+  nextcloud-data:
+  caddy-data:
+  caddy-config:
