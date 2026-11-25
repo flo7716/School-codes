@@ -18,6 +18,7 @@ ok()   { printf '\033[32m✔ %s\033[0m\n' "$*"; }
 info() { printf '\033[36m→ %s\033[0m\n' "$*"; }
 warn() { printf '\033[33m! %s\033[0m\n' "$*"; }
 die()  { printf '\033[31m✘ %s\033[0m\n' "$*" >&2; exit 1; }
+trap 'printf "\033[31m✘ Échec ligne %s : %s\033[0m\n" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
 [[ $EUID -eq 0 ]] || die "À lancer avec sudo."
 

@@ -15,10 +15,19 @@ c_err()  { printf '\033[31m%s\033[0m\n' "$*" >&2; }
 require() {
     command -v docker >/dev/null || { c_err "Docker introuvable."; exit 1; }
     docker compose version >/dev/null 2>&1 || { c_err "Docker Compose v2 requis (docker compose)."; exit 1; }
+    # Docker Desktop (VM) n'est pas supporté : réseau et ports différents
+    local ctx
+    ctx=$(docker context show 2>/dev/null || echo "?")
+    if [[ "$ctx" == desktop-linux || "${DOCKER_HOST:-}" == *desktop* ]]; then
+        c_err "Docker pointe vers Docker Desktop (contexte : $ctx), non supporté par ce labo."
+        c_err "Corriger : docker context use default   (et unset DOCKER_HOST si défini)"
+        exit 1
+    fi
+    docker info >/dev/null 2>&1 || { c_err "Le démon Docker ne répond pas : sudo systemctl enable --now docker"; exit 1; }
     command -v ssh-keygen >/dev/null || { c_err "ssh-keygen introuvable (paquet openssh-client)."; exit 1; }
 }
 
-randpw() { LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24; }
+randpw() { head -c 512 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9' | head -c 24; }
 
 init_secrets() {
     mkdir -p "$SECRETS_DIR"
@@ -28,10 +37,10 @@ init_secrets() {
         umask 077
         cat > .env <<EOF
 # Généré par deploy.sh le $(date -Iseconds) — ne pas versionner
-BIND_IP=127.0.0.1
+BIND_IP=${BIND_IP:-127.0.0.1}
 SSH_PUBLIC_PORT=2222
 HTTPS_PUBLIC_PORT=443
-NEXTCLOUD_DOMAIN=nextcloud.localhost
+NEXTCLOUD_DOMAIN=${NEXTCLOUD_DOMAIN:-nextcloud.localhost}
 PIHOLE_PASSWORD=$(randpw)
 MARIADB_ROOT_PASSWORD=$(randpw)
 MARIADB_PASSWORD=$(randpw)

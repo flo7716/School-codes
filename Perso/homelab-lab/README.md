@@ -105,6 +105,30 @@ Le script installe :
 
 **Dans Cockpit** : Docker n'apparaît pas, car le module conteneurs de Cockpit (`cockpit-podman`) ne gère que Podman. Utilise `docker` en SSH, ou passe à Podman plus tard. En revanche, Cockpit gère très bien les VMs, le stockage, les journaux, les mises à jour, SELinux et firewalld.
 
+### Répéter sur une VM AlmaLinux (avant l'arrivée du M920x)
+
+`host/vm.sh` crée sur ton Fedora une VM AlmaLinux qui joue le rôle du M920x. Elle reçoit le même script `setup-host.sh`, le même labo et son propre Cockpit.
+
+```bash
+./deploy.sh down                 # arrêter le labo du laptop (mêmes ports)
+./host/vm.sh all                 # create + push + deploy + access (~20 min)
+./host/vm.sh tunnel              # Cockpit AlmaLinux -> https://localhost:9090
+                                 # Pi-hole            -> http://localhost:8080/admin
+```
+
+| Commande | Rôle |
+|---|---|
+| `create` | VM Alma 9 (6 Go de RAM, 4 vCPU, 40 Go), installation automatique (kickstart), SELinux en Enforcing, firewalld actif |
+| `push` | copie le projet dans `~/homelab-lab` de la VM |
+| `deploy` | dans la VM : `setup-host.sh`, puis `deploy.sh` avec `BIND_IP` = IP de la VM et `NEXTCLOUD_DOMAIN=nextcloud.home.arpa` |
+| `access` | récupère la clé du bastion et la CA, ajoute `nextcloud.home.arpa` dans `/etc/hosts`, fait confiance à la CA |
+| `tunnel` / `test` / `ssh` / `ip` / `stop` / `start` / `destroy` | gestion courante |
+
+- **Cockpit d'AlmaLinux** : utilisateur = ton nom d'utilisateur Fedora, mot de passe dans `vm-access/vm-password.txt`. C'est aussi le mot de passe `sudo` de la VM.
+- **Nextcloud** : https://nextcloud.home.arpa depuis le navigateur ou GNOME.
+- Réglages possibles : `VM_RAM=8192 VM_CPUS=4 ALMA_VERSION=10 ./host/vm.sh create`.
+- Tout ce qui sert à accéder à la VM est dans `vm-access/`, ignoré par git.
+
 ### Passer du laptop au serveur
 
 Dans le `.env` du serveur :
