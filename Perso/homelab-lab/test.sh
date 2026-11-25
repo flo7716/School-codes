@@ -27,10 +27,11 @@ nc_installed() { "${SSH[@]}" 'wget -q -T5 -O- http://10.10.10.20/status.php' | g
 source .env
 DOMAIN=${NEXTCLOUD_DOMAIN:-nextcloud.localhost}
 PORT=${HTTPS_PUBLIC_PORT:-443}
+TARGET=${BIND_IP:-127.0.0.1}; [[ $TARGET == 0.0.0.0 ]] && TARGET=127.0.0.1
 # Depuis le laptop, comme un navigateur (CA récupérée dans le conteneur Caddy)
 docker cp lab-proxy:/data/caddy/pki/authorities/local/root.crt /tmp/homelab-ca.crt >/dev/null 2>&1
-https_nc() { curl -sf --max-time 5 --cacert /tmp/homelab-ca.crt --resolve "$DOMAIN:$PORT:127.0.0.1" "https://$DOMAIN:$PORT/status.php" | grep -q '"installed":true'; }
-https_dav() { curl -s -o /dev/null -w '%{http_code}' --max-time 5 --cacert /tmp/homelab-ca.crt --resolve "$DOMAIN:$PORT:127.0.0.1" "https://$DOMAIN:$PORT/.well-known/caldav" | grep -q '^30[17]$'; }
+https_nc() { curl -sf --max-time 5 --cacert /tmp/homelab-ca.crt --resolve "$DOMAIN:$PORT:$TARGET" "https://$DOMAIN:$PORT/status.php" | grep -q '"installed":true'; }
+https_dav() { curl -s -o /dev/null -w '%{http_code}' --max-time 5 --cacert /tmp/homelab-ca.crt --resolve "$DOMAIN:$PORT:$TARGET" "https://$DOMAIN:$PORT/.well-known/caldav" | grep -q '^30[17]$'; }
 
 echo "== Routeur"
 expect ok   "règles nftables chargées"                docker exec lab-router nft list table inet labfw
@@ -58,6 +59,10 @@ echo "== Bastion"
 expect ok   "connexion SSH par clé via 127.0.0.1"     "${SSH[@]}" true
 expect fail "connexion par mot de passe refusée"      timeout 15 ssh -F ssh_config -o BatchMode=yes -o PubkeyAuthentication=no -o PreferredAuthentications=password lab-bastion true
 expect ok   "bastion -> Pi-hole (HTTP)"               "${SSH[@]}" 'wget -q -T5 -O /dev/null http://10.10.10.10/admin/'
+cockpit_up() { "${SSH[@]}" "wget -q -T5 --no-check-certificate -O /dev/null https://10.10.20.1:9090/"; }
+if systemctl is-active --quiet cockpit.socket 2>/dev/null; then
+    expect ok "bastion -> Cockpit de l'hôte (10.10.20.1:9090)" cockpit_up
+fi
 expect fail "bastion -> Internet refusé"              "${SSH[@]}" 'wget -q -T5 -O /dev/null http://1.1.1.1'
 
 printf '  … attente de Nextcloud'

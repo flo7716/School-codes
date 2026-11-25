@@ -48,8 +48,9 @@ services:
       PROXY_IP: 10.10.10.30
       SSH_DNAT_PORT: "2222"
     ports:
-      - "127.0.0.1:${SSH_PUBLIC_PORT:-2222}:2222"        # admin : SSH -> bastion
-      - "127.0.0.1:${HTTPS_PUBLIC_PORT:-443}:443"        # utilisateurs : HTTPS -> reverse proxy
+      # BIND_IP : 127.0.0.1 sur le laptop, IP LAN du serveur sur le M920x
+      - "${BIND_IP:-127.0.0.1}:${SSH_PUBLIC_PORT:-2222}:2222"    # admin : SSH -> bastion
+      - "${BIND_IP:-127.0.0.1}:${HTTPS_PUBLIC_PORT:-443}:443"    # utilisateurs : HTTPS -> reverse proxy
     networks:
       wan:
         ipv4_address: 172.31.0.254

@@ -16,7 +16,8 @@ LoginGraceTime 20
 # et seulement vers les destinations listées ici.
 AllowTcpForwarding local
 # (Nextcloud passe par le reverse proxy HTTPS, pas par le bastion)
-PermitOpen 10.10.10.10:80
+# 10.10.20.1:9090 = Cockpit sur l'hôte (IP de l'hôte sur le réseau admin)
+PermitOpen 10.10.10.10:80 10.10.20.1:9090
 GatewayPorts no
 AllowAgentForwarding no
 X11Forwarding no

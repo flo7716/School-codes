@@ -4,7 +4,9 @@ Maquette de l'architecture prévue sur le ThinkCentre M920x, à tester sur un la
 
 **Deux accès séparés :**
 - **Utilisateurs** → `https://nextcloud.localhost`, depuis le navigateur ou les comptes en ligne de GNOME.
-- **Administration** → SSH via le bastion uniquement (shell, tunnel vers Pi-hole, etc.).
+- **Administration** → SSH via le bastion uniquement (shell, tunnels vers Pi-hole et Cockpit).
+
+**Hôte cible** : AlmaLinux (ou Rocky) sur le M920x, avec Docker Engine natif, KVM/libvirt et Cockpit. Le même projet tourne sur un laptop Fedora pour les tests.
 
 ## Architecture
 
@@ -40,7 +42,8 @@ Flux autorisés par le routeur (politique par défaut : tout est refusé) :
 
 ## Prérequis
 
-- Docker Engine avec Compose v2. Un laptop sous Linux est l'idéal ; Docker Desktop (Mac, Windows) devrait aussi fonctionner.
+- **Docker Engine natif** (`docker-ce`) avec Compose v2, version 28 ou plus récente (`gw_priority`).
+  ⚠️ **Docker Desktop n'est pas pris en charge** : réseau dans une machine virtuelle, pas de port < 1024. Vérifie que `docker context show` affiche `default`.
 - `ssh`, `ssh-keygen`, `curl`.
 - Le port 443 libre sur le laptop. Sinon, change `HTTPS_PUBLIC_PORT` dans `.env`.
 - ~3 Go de RAM libre.
@@ -78,8 +81,42 @@ Ouvre **https://nextcloud.localhost**. Les identifiants sont dans `.env` (`NEXTC
 ```bash
 ssh -F ssh_config lab-bastion   # shell sur le bastion
 ./deploy.sh tunnel              # Pi-hole → http://localhost:8080/admin
+                                # Cockpit → https://localhost:9090
 ./deploy.sh status | logs [service] | down | reset
 ```
+
+## Hôte AlmaLinux + Cockpit
+
+```bash
+sudo ./host/setup-host.sh   # une seule fois, idempotent
+./deploy.sh
+```
+
+Le script installe :
+- **Docker Engine** (dépôt officiel), avec rotation des logs et `live-restore` : les conteneurs survivent à un redémarrage du démon Docker ;
+- **KVM / libvirt** pour les futures VMs, avec les démons libvirt modulaires ;
+- **Cockpit** avec les modules machines virtuelles, stockage, SELinux et fichiers.
+
+**Comment Cockpit est protégé :**
+- Il n'écoute que sur `10.10.20.1:9090`, l'IP de l'hôte sur le réseau Docker `admin`. Il n'est **pas** joignable depuis le LAN de la maison.
+- Le service `cockpit` est retiré de la zone firewalld par défaut.
+- Accès : laptop → bastion (SSH) → `10.10.20.1:9090`, avec `./deploy.sh tunnel`.
+- Connexion avec ton compte Linux (groupe `wheel`) ; `root` est interdit. Déconnexion automatique après 15 minutes d'inactivité.
+
+**Dans Cockpit** : Docker n'apparaît pas, car le module conteneurs de Cockpit (`cockpit-podman`) ne gère que Podman. Utilise `docker` en SSH, ou passe à Podman plus tard. En revanche, Cockpit gère très bien les VMs, le stockage, les journaux, les mises à jour, SELinux et firewalld.
+
+### Passer du laptop au serveur
+
+Dans le `.env` du serveur :
+```
+BIND_IP=192.168.1.50                 # IP LAN du M920x (et non 127.0.0.1)
+NEXTCLOUD_DOMAIN=nextcloud.home.arpa # *.localhost ne marche que sur la machine elle-même
+```
+Ensuite :
+1. sur le serveur : `./deploy.sh down && ./deploy.sh`, puis `./deploy.sh nextcloud-domain` ;
+2. sur chaque appareil client, faire pointer le nom vers le serveur (`/etc/hosts` ou un enregistrement DNS local) et faire confiance à la CA du labo. Copie `secrets/homelab-ca.crt` du serveur, puis `./deploy.sh trust-ca` sur un laptop Linux.
+
+Docker ouvre lui-même les ports publiés dans firewalld (zone `docker`). Vérifie avec `sudo ss -ltnp` que seuls 443 et 2222 écoutent sur l'IP LAN.
 
 ### Instance installée avec une version précédente du labo
 
@@ -104,6 +141,7 @@ Les domaines approuvés de Nextcloud ne sont lus qu'à l'installation. Deux solu
 - Pas encore de WireGuard.
 - Les images `latest` / `stable` sont à figer sur des versions précises avant un usage réel.
 - Podman rootless n'est pas supporté. Podman en root devrait fonctionner avec `podman compose`.
+- Docker n'active pas le confinement SELinux des conteneurs par défaut (`selinux-enabled: false`). L'hôte reste en Enforcing, mais les conteneurs ne sont pas confinés : c'est une piste de durcissement, à tester (NET_ADMIN, nftables).
 
 ## Passage sur le M920x
 

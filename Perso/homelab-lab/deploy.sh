@@ -28,6 +28,7 @@ init_secrets() {
         umask 077
         cat > .env <<EOF
 # Généré par deploy.sh le $(date -Iseconds) — ne pas versionner
+BIND_IP=127.0.0.1
 SSH_PUBLIC_PORT=2222
 HTTPS_PUBLIC_PORT=443
 NEXTCLOUD_DOMAIN=nextcloud.localhost
@@ -41,6 +42,7 @@ EOF
         c_ok "Fichier .env créé avec des mots de passe aléatoires."
     fi
     # .env créé par une version précédente du labo : on complète
+    grep -q '^BIND_IP=' .env           || echo 'BIND_IP=127.0.0.1' >> .env
     grep -q '^HTTPS_PUBLIC_PORT=' .env || echo 'HTTPS_PUBLIC_PORT=443' >> .env
     grep -q '^NEXTCLOUD_DOMAIN=' .env  || echo 'NEXTCLOUD_DOMAIN=nextcloud.localhost' >> .env
 
@@ -49,12 +51,14 @@ EOF
         c_ok "Clé SSH du labo créée : $KEY"
     fi
 
-    local port
+    local port host
     port=$(grep -E '^SSH_PUBLIC_PORT=' .env | cut -d= -f2)
+    host=$(grep -E '^BIND_IP=' .env | cut -d= -f2)
+    [[ -z "$host" || "$host" == 0.0.0.0 ]] && host=127.0.0.1
     cat > "$SSH_CFG" <<EOF
 # Généré par deploy.sh — usage : ssh -F ssh_config lab-bastion
 Host lab-bastion
-    HostName 127.0.0.1
+    HostName ${host}
     Port ${port:-2222}
     User admin
     IdentityFile $KEY
@@ -76,7 +80,8 @@ $(c_ok "Labo démarré.")
                  -> navigateur, ou GNOME : Paramètres > Comptes en ligne > Nextcloud
                  -> 1re fois : ./deploy.sh trust-ca  (faire confiance au certificat)
   Admin (SSH)  : ssh -F ssh_config lab-bastion
-                 ./deploy.sh tunnel  -> Pi-hole sur http://localhost:8080/admin (mdp : $PIHOLE_PASSWORD)
+                 ./deploy.sh tunnel  -> Pi-hole : http://localhost:8080/admin (mdp : $PIHOLE_PASSWORD)
+                                        Cockpit : https://localhost:9090 (si installé sur l'hôte)
   Tests        : ./deploy.sh test    (Nextcloud met 1 à 2 min à s'installer au 1er lancement)
   Mots de passe: fichier .env
 EOF
@@ -107,8 +112,13 @@ case "$cmd" in
         docker compose ps
         ;;
     tunnel)
-        c_warn "Tunnel admin ouvert (Ctrl+C pour fermer) : Pi-hole -> http://localhost:8080/admin"
-        exec ssh -F "$SSH_CFG" -N -L 8080:10.10.10.10:80 lab-bastion
+        c_warn "Tunnels admin ouverts (Ctrl+C pour fermer) :"
+        c_warn "  Pi-hole -> http://localhost:8080/admin"
+        c_warn "  Cockpit -> https://localhost:9090   (hôte, si host/setup-host.sh a été lancé)"
+        exec ssh -F "$SSH_CFG" -N \
+            -L 8080:10.10.10.10:80 \
+            -L 9090:10.10.20.1:9090 \
+            lab-bastion
         ;;
     trust-ca)
         # Exporte la CA interne de Caddy et l'ajoute au magasin système du laptop
@@ -128,6 +138,14 @@ case "$cmd" in
             certutil -d "sql:$HOME/.pki/nssdb" -A -t "C,," -n homelab-ca -i "$SECRETS_DIR/homelab-ca.crt"
         fi
         c_ok "CA installée pour le système (GNOME, curl, Chrome si certutil est présent)."
+        # Nom -> IP en IPv4 explicite (sinon *.localhost peut partir sur ::1, non publié)
+        # shellcheck disable=SC1091
+        source .env
+        local_ip=${BIND_IP:-127.0.0.1}; [[ "$local_ip" == 0.0.0.0 ]] && local_ip=127.0.0.1
+        if ! grep -qE "^[0-9.]+[[:space:]]+${NEXTCLOUD_DOMAIN//./\\.}([[:space:]]|$)" /etc/hosts; then
+            echo "$local_ip  $NEXTCLOUD_DOMAIN" | sudo tee -a /etc/hosts >/dev/null
+            c_ok "/etc/hosts : $NEXTCLOUD_DOMAIN -> $local_ip"
+        fi
         c_warn "Firefox : about:config -> security.enterprise_roots.enabled = true, ou importer le .crt dans Paramètres > Certificats."
         ;;
     nextcloud-domain)
